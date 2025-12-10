@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "TRANG CHỦ",
+    "products": "SẢN PHẨM",
+    "about": "VỀ CHÚNG TÔI"
+  },
+  "intro": {
+    "title": "Chào mừng đến với MARVERL HEROES của chúng tôi",
+    "description": "Nơi Nghệ thuật Huyền thoại Gặp gỡ Các Anh hùng Marvel Biểu tượng"
+  },
+  "site": {
+    "title": "Chào mừng đến với trang web tuyệt vời của chúng tôi",
+    "description": "Trải nghiệm hình ảnh đẹp với hoạt ảnh mượt mà"
+  },
+  "sections": {
+    "counter": "Demo Bộ đếm",
+    "todo": "Danh sách công việc",
+    "about": "Về Chúng Tôi"
+  },
+  "about": {
+    "description": "Chúng tôi đam mê tạo ra những trải nghiệm web đẹp mắt với công nghệ hiện đại. Đội ngũ của chúng tôi kết hợp sự sáng tạo với chuyên môn kỹ thuật để mang đến các giải pháp số xuất sắc."
+  },
+  "actions": {
+    "add": "Thêm",
+    "reset": "Đặt lại",
+    "delete": "Xóa"
+  },
+  "placeholders": {
+    "enterTask": "Nhập một nhiệm vụ..."
+  },
+  "messages": {
+    "noTasks": "Chưa có nhiệm vụ nào. Thêm một nhiệm vụ ở trên!",
+    "builtWith": "Được xây dựng với Vue.js"
+  },
+  "themes": {
+    "light": "☀️ Sáng",
+    "dark": "🌙 Tối",
+    "material": "🎨 Material Design",
+    "dracula": "🧛 Dracula",
+    "nord": "❄️ Nord",
+    "monokai": "💻 Monokai",
+    "github": "🐙 GitHub",
+    "sunset": "🌅 Hoàng hôn",
+    "ocean": "🌊 Đại dương"
+  },
+  "languages": {
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  }
+}

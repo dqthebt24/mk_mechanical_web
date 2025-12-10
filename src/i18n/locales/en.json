@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "HOME",
+    "products": "PRODUCTS",
+    "about": "ABOUT US"
+  },
+  "intro": {
+    "title": "Welcome to Our MARVEL HEROES",
+    "description": "Where Legendary Craftsmanship Meets Iconic Marvel Heroes"
+  },
+  "site": {
+    "title": "Welcome to Our Amazing Site",
+    "description": "Experience beautiful visuals with smooth animations"
+  },
+  "sections": {
+    "counter": "Counter Demo",
+    "todo": "Todo List",
+    "about": "About Us"
+  },
+  "about": {
+    "description": "We are passionate about creating beautiful web experiences with modern technologies. Our team combines creativity with technical expertise to deliver exceptional digital solutions."
+  },
+  "actions": {
+    "add": "Add",
+    "reset": "Reset",
+    "delete": "Delete"
+  },
+  "placeholders": {
+    "enterTask": "Enter a task..."
+  },
+  "messages": {
+    "noTasks": "No tasks yet. Add one above!",
+    "builtWith": "Built with Vue.js"
+  },
+  "themes": {
+    "light": "☀️ Light",
+    "dark": "🌙 Dark",
+    "material": "🎨 Material Design",
+    "dracula": "🧛 Dracula",
+    "nord": "❄️ Nord",
+    "monokai": "💻 Monokai",
+    "github": "🐙 GitHub",
+    "sunset": "🌅 Sunset",
+    "ocean": "🌊 Ocean"
+  },
+  "languages": {
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  }
+}
