@@ -15,10 +15,36 @@
   "sections": {
     "counter": "Demo Bộ đếm",
     "todo": "Danh sách công việc",
-    "about": "Về Chúng Tôi"
+    "about": "Về Chúng Tôi",
+    "products": "Sản Phẩm"
   },
   "about": {
-    "description": "Chúng tôi đam mê tạo ra những trải nghiệm web đẹp mắt với công nghệ hiện đại. Đội ngũ của chúng tôi kết hợp sự sáng tạo với chuyên môn kỹ thuật để mang đến các giải pháp số xuất sắc."
+    "description": "Chúng tôi đam mê tạo ra những trải nghiệm web đẹp mắt với công nghệ hiện đại. Đội ngũ của chúng tôi kết hợp sự sáng tạo với chuyên môn kỹ thuật để mang đến các giải pháp số xuất sắc.",
+    "contactUs": "Liên Hệ Chúng Tôi",
+    "address": "Số 777 Đường Yatin, Phố Yangxi, Jiande, Zhejiang, Trung Quốc",
+    "email": "Jane.Xu@test.com",
+    "phone": "+84 0571 5830 0123"
+  },
+  "products": {
+    "viewDetail": "Xem Chi Tiết",
+    "items": [
+      {
+        "title": "Linh Kiện Cơ Khí Cao Cấp",
+        "description": "Linh kiện được gia công chính xác cao với độ bền vượt trội và hiệu suất tối ưu cho ứng dụng công nghiệp."
+      },
+      {
+        "title": "Phụ Tùng Công Nghiệp Tiên Tiến",
+        "description": "Phụ tùng cơ khí hiện đại được thiết kế cho hoạt động hạng nặng với độ tin cậy đặc biệt."
+      },
+      {
+        "title": "Thiết Bị Cấp Chuyên Nghiệp",
+        "description": "Thiết bị cơ khí cấp chuyên nghiệp được chế tạo để chịu đựng môi trường làm việc khắc nghiệt."
+      },
+      {
+        "title": "Giải Pháp Kỹ Thuật Chính Xác",
+        "description": "Giải pháp kỹ thuật tiên tiến với độ chính xác cao mang lại hiệu suất và hiệu quả tối ưu."
+      }
+    ]
   },
   "actions": {
     "add": "Thêm",
@@ -30,7 +56,7 @@
   },
   "messages": {
     "noTasks": "Chưa có nhiệm vụ nào. Thêm một nhiệm vụ ở trên!",
-    "builtWith": "Được xây dựng với Vue.js"
+    "builtWith": "Bản quyền © 2012-2023 mechanism.com All Rights Reserved. Được xây dựng bởi dqthebt"
   },
   "themes": {
     "light": "☀️ Sáng",
