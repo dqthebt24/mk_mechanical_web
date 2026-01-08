@@ -15,10 +15,36 @@
   "sections": {
     "counter": "Counter Demo",
     "todo": "Todo List",
-    "about": "About Us"
+    "about": "About Us",
+    "products": "Products"
   },
   "about": {
-    "description": "We are passionate about creating beautiful web experiences with modern technologies. Our team combines creativity with technical expertise to deliver exceptional digital solutions."
+    "description": "We are passionate about creating beautiful web experiences with modern technologies. Our team combines creativity with technical expertise to deliver exceptional digital solutions.",
+    "contactUs": "Contact Us",
+    "address": "No.777 Yatin Road, Yangxi Street, Jiande, Zhejiang, China",
+    "email": "Jane.Xu@test.com",
+    "phone": "+84 0571 5830 0123"
+  },
+  "products": {
+    "viewDetail": "View Detail",
+    "items": [
+      {
+        "title": "Premium Mechanical Component",
+        "description": "High-precision engineered component with superior durability and performance for industrial applications."
+      },
+      {
+        "title": "Advanced Industrial Part",
+        "description": "State-of-the-art mechanical part designed for heavy-duty operations with exceptional reliability."
+      },
+      {
+        "title": "Professional Grade Equipment",
+        "description": "Professional-grade mechanical equipment built to withstand demanding work environments."
+      },
+      {
+        "title": "Precision Engineering Solution",
+        "description": "Cutting-edge precision engineered solution delivering optimal performance and efficiency."
+      }
+    ]
   },
   "actions": {
     "add": "Add",
@@ -30,7 +56,7 @@
   },
   "messages": {
     "noTasks": "No tasks yet. Add one above!",
-    "builtWith": "Built with Vue.js"
+    "builtWith": "Copyright © 2012-2023 mechanism.com All Rights Reserved. POWERED BY dqthebt"
   },
   "themes": {
     "light": "☀️ Light",
