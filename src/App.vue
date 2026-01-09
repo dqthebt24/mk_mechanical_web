@@ -50,36 +50,146 @@
       </div>
     </section>
 
-    <main id="products">
+    <main>
+      <section id="products" class="products-section">
+        <h2>{{ t('sections.products') }}</h2>
+        <div class="products-carousel">
+          <button @click="prevProduct" class="carousel-arrow arrow-left" :aria-label="'Previous product'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          
+          <div class="products-slider">
+            <div 
+              class="product-card"
+              v-for="(product, index) in products"
+              :key="product.id"
+              :class="{ 
+                active: index === currentProductIndex,
+                prev: index === (currentProductIndex - 1 + products.length) % products.length,
+                next: index === (currentProductIndex + 1) % products.length
+              }"
+            >
+              <div class="product-image-wrapper">
+                <img :src="product.image" :alt="t(product.titleKey)" class="product-image">
+              </div>
+              <div class="product-info">
+                <h3 class="product-title">{{ t(product.titleKey) }}</h3>
+                <p class="product-description">{{ t(product.descriptionKey) }}</p>
+                <a :href="product.detailLink" class="view-detail-btn">{{ t('products.viewDetail') }}</a>
+              </div>
+            </div>
+          </div>
+          
+          <button @click="nextProduct" class="carousel-arrow arrow-right" :aria-label="'Next product'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="product-indicators">
+          <button 
+            v-for="(product, index) in products"
+            :key="index"
+            @click="currentProductIndex = index"
+            :class="{ active: index === currentProductIndex }"
+            class="product-indicator"
+          ></button>
+        </div>
+      </section>
+
       <section id="about" class="about-section">
         <h2>{{ t('sections.about') }}</h2>
         <p>{{ t('about.description') }}</p>
+        
+        <div class="contact-us">
+          <div class="contact-info">
+            <p class="contact-item">
+              <svg class="contact-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>{{ t('about.address') }}</span>
+            </p>
+            <p class="contact-item">
+              <svg class="contact-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <a :href="'mailto:' + t('about.email')" class="contact-link">{{ t('about.email') }}</a>
+            </p>
+            <p class="contact-item">
+              <svg class="contact-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <a :href="'tel:' + t('about.phone').replace(/\\s/g, '')" class="contact-link">{{ t('about.phone') }}</a>
+            </p>
+          </div>
+        </div>
       </section>
     </main>
 
     <footer>
-      <p>{{ t('messages.builtWith') }} {{ vueVersion }}</p>
+      <p>{{ t('messages.builtWith') }}</p>
     </footer>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { version } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { applyTheme, colorThemes } from './utils/themes.js'
 import intro1 from './assets/images/intro_1.jpg'
 import intro2 from './assets/images/intro_2.jpg'
 import logo from './assets/images/LOGO-2.png'
+import product1 from './assets/products/dea84daa22.jpg'
+import product2 from './assets/products/2-4170.jpg'
+import product3 from './assets/products/ip1.jpg'
+import product4 from './assets/products/afa20505a8.jpg'
 
 export default {
   name: 'App',
   setup() {
     const { t, locale } = useI18n()
-    const vueVersion = version
+    // const vueVersion = version
     const selectedTheme = ref('light')
     const currentImage = ref(0)
     const isScrolled = ref(false)
+    const currentProductIndex = ref(0)
+
+    const products = ref([
+      {
+        id: 1,
+        image: product1,
+        titleKey: 'products.items.0.title',
+        descriptionKey: 'products.items.0.description',
+        detailLink: '#product-1'
+      },
+      {
+        id: 2,
+        image: product2,
+        titleKey: 'products.items.1.title',
+        descriptionKey: 'products.items.1.description',
+        detailLink: '#product-2'
+      },
+      {
+        id: 3,
+        image: product3,
+        titleKey: 'products.items.2.title',
+        descriptionKey: 'products.items.2.description',
+        detailLink: '#product-3'
+      },
+      {
+        id: 4,
+        image: product4,
+        titleKey: 'products.items.3.title',
+        descriptionKey: 'products.items.3.description',
+        detailLink: '#product-4'
+      }
+    ])
 
     const themes = ref([
       { value: 'light', label: 'themes.light' },
@@ -98,10 +208,6 @@ export default {
       localStorage.setItem('theme', selectedTheme.value)
     }
 
-
-
-
-
     const setCurrentImage = (index) => {
       currentImage.value = index
     }
@@ -117,6 +223,24 @@ export default {
       locale.value = lang
       localStorage.setItem('language', lang)
     }
+
+    const nextProduct = () => {
+      currentProductIndex.value = (currentProductIndex.value + 1) % products.value.length
+    }
+
+    const prevProduct = () => {
+      currentProductIndex.value = (currentProductIndex.value - 1 + products.value.length) % products.value.length
+    }
+
+    const themeTextStyle = computed(() => {
+      const currentTheme = colorThemes[selectedTheme.value] || colorThemes.light
+      
+      return {
+        title: currentTheme.primary,
+        description: currentTheme.textPrimary,
+        shadow: `2px 2px 8px ${currentTheme.primary}40`
+      }
+    })
 
     onMounted(() => {
       const savedLanguage = localStorage.getItem('language') || 'en'
@@ -146,7 +270,6 @@ export default {
     return {
       t,
       locale,
-      vueVersion,
       selectedTheme,
       themes,
       intro1,
@@ -157,7 +280,12 @@ export default {
       changeTheme,
       changeLanguage,
       setCurrentImage,
-      scrollToSection
+      scrollToSection,
+      products,
+      currentProductIndex,
+      nextProduct,
+      prevProduct,
+      themeTextStyle
     }
   }
 }
@@ -300,10 +428,9 @@ header.floating .theme-select {
 
 main {
   flex: 1;
-  max-width: 800px;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0;
   position: relative;
   z-index: 5;
 }
@@ -317,28 +444,437 @@ section {
   transition: all 0.3s ease;
 }
 
+.about-section {
+  background: var(--bg-primary);
+  padding: 4rem 2rem;
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.about-section h2 {
+  text-align: left;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--text-primary);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 5rem;
+}
+
+.about-section p {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 5rem;
+  padding-right: 5rem;
+  text-align: left;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
 h2 {
   margin-top: 0;
   color: var(--text-primary);
 }
 
-
-
-.about-section {
-  text-align: center;
+/* Products Section */
+.products-section {
+  background: var(--bg-primary);
+  padding: 4rem 2rem;
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.about-section p {
-  font-size: 1.2rem;
+.products-section h2 {
+  text-align: left;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--text-primary);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 5rem;
+}
+
+.products-carousel {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.products-slider {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+  height: 500px;
+}
+
+.product-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateX(100%) scale(0.85);
+  transition: all 0.6s ease-in-out;
+  display: flex;
+  gap: 2rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.product-card.active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.product-card:not(.active) {
+  filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Show previous card on the left */
+.product-card.prev {
+  opacity: 0.5;
+  transform: translateX(-110%) scale(0.85);
+  z-index: 2;
+  filter: blur(1px);
+}
+
+/* Show next card on the right */
+.product-card.next {
+  opacity: 0.5;
+  transform: translateX(110%) scale(0.85);
+  z-index: 2;
+  filter: blur(1px);
+}
+
+.product-image-wrapper {
+  flex: 1;
+  min-width: 50%;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-info {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.product-title {
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+}
+
+.product-description {
+  font-size: 1.1rem;
   line-height: 1.6;
   color: var(--text-secondary);
-  max-width: 600px;
-  margin: 0 auto;
+  margin-bottom: 2rem;
+}
+
+.view-detail-btn {
+  display: inline-block;
+  padding: 0.875rem 2rem;
+  background: var(--primary-color);
+  color: var(--text-white);
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  text-align: center;
+  align-self: flex-start;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.view-detail-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-arrow {
+  background: var(--bg-card);
+  border: 2px solid var(--border-light);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+  z-index: 10;
+  position: relative;
+}
+
+.carousel-arrow:active {
+  transform: scale(0.95);
+}
+
+.carousel-arrow:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-white);
+  transform: scale(1.1);
+}
+
+.carousel-arrow svg {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.product-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.product-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border-light);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.product-indicator:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  transform: scale(1.2);
+}
+
+.product-indicator.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: scale(1.3);
+}
+
+@media (max-width: 768px) {
+  .products-section {
+    padding: 3rem 1rem;
+  }
+  
+  .products-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .products-carousel {
+    gap: 1rem;
+  }
+  
+  .products-slider {
+    height: auto;
+    min-height: 550px;
+    overflow: hidden;
+  }
+  
+  .product-card {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .product-card.prev,
+  .product-card.next {
+    opacity: 0.3;
+    transform: translateX(-105%) scale(0.9);
+  }
+  
+  .product-card.next {
+    transform: translateX(105%) scale(0.9);
+  }
+  
+  .product-image-wrapper {
+    min-width: 100%;
+    max-height: 300px;
+  }
+  
+  .product-info {
+    padding: 1.5rem;
+  }
+  
+  .product-title {
+    font-size: 1.5rem;
+  }
+  
+  .product-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .carousel-arrow {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .carousel-arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-section {
+    padding: 2rem 0.5rem;
+  }
+  
+  .products-section h2 {
+    font-size: 1.75rem;
+    padding: 0 0.5rem;
+  }
+  
+  .products-carousel {
+    gap: 0.5rem;
+  }
+  
+  .products-slider {
+    min-height: 500px;
+    overflow: hidden;
+  }
+  
+  .product-card.prev,
+  .product-card.next {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.8);
+    pointer-events: none;
+  }
+  
+  .product-card.next {
+    transform: translateX(100%) scale(0.8);
+  }
+  
+  .product-card.active {
+    transform: translateX(0) scale(1);
+  }
+  
+  .product-image-wrapper {
+    max-height: 220px;
+  }
+  
+  .product-info {
+    padding: 1rem;
+  }
+  
+  .product-title {
+    font-size: 1.25rem;
+  }
+  
+  .product-description {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  
+  .view-detail-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  
+  .carousel-arrow {
+    width: 36px;
+    height: 36px;
+    border-width: 1px;
+  }
+  
+  .carousel-arrow svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .product-indicators {
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .product-indicator {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.contact-us {
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  padding-left: 0rem;
+  padding-right: 0rem;
+}
+
+.contact-info {
+  /* display: flex; */
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.contact-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  color: var(--text-primary);
+}
+
+.contact-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
 }
 
 footer {
-  background: var(--secondary-color);
-  color: var(--text-white);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   text-align: center;
   padding: 1rem;
 }
