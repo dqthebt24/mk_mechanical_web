@@ -5,12 +5,36 @@
         <div class="logo-section">
           <img :src="logo" alt="Logo" class="logo">
         </div>
-        <nav class="navigation">
-          <a @click.prevent="scrollToSection('home')" href="#home" class="nav-link">{{ t('nav.home') }}</a>
-          <a @click.prevent="scrollToSection('products')" href="#products" class="nav-link">{{ t('nav.products') }}</a>
-          <a @click.prevent="scrollToSection('about')" href="#about" class="nav-link">{{ t('nav.about') }}</a>
+        
+        <button class="hamburger" @click="mobileMenuOpen = !mobileMenuOpen" :class="{ 'active': mobileMenuOpen }">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <nav class="navigation" :class="{ 'mobile-open': mobileMenuOpen }">
+          <a @click.prevent="scrollToSection('home'); mobileMenuOpen = false" href="#home" class="nav-link">{{ t('nav.home') }}</a>
+          <a @click.prevent="scrollToSection('products'); mobileMenuOpen = false" href="#products" class="nav-link">{{ t('nav.products') }}</a>
+          <a @click.prevent="scrollToSection('about'); mobileMenuOpen = false" href="#about" class="nav-link">{{ t('nav.about') }}</a>
+          
+          <div class="theme-controls mobile-in-menu" :class="{ 'mobile-open': mobileMenuOpen }">
+            <div class="theme-dropdown">
+              <select v-model="locale" @change="changeLanguage(locale)" class="theme-select">
+                <option value="en">{{ t('languages.english') }}</option>
+                <option value="vi">{{ t('languages.vietnamese') }}</option>
+              </select>
+            </div>
+            <div class="theme-dropdown">
+              <select v-model="selectedTheme" @change="changeTheme" class="theme-select">
+                <option v-for="theme in themes" :key="theme.value" :value="theme.value">
+                  {{ t(theme.label) }}
+                </option>
+              </select>
+            </div>
+          </div>
         </nav>
-        <div class="theme-controls">
+        
+        <div class="theme-controls desktop-only">
           <div class="theme-dropdown">
             <select v-model="locale" @change="changeLanguage(locale)" class="theme-select">
               <option value="en">{{ t('languages.english') }}</option>
@@ -138,7 +162,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { version } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { applyTheme, colorThemes } from './utils/themes.js'
@@ -154,11 +178,11 @@ export default {
   name: 'App',
   setup() {
     const { t, locale } = useI18n()
-    // const vueVersion = version
     const selectedTheme = ref('light')
     const currentImage = ref(0)
     const isScrolled = ref(false)
     const currentProductIndex = ref(0)
+    const mobileMenuOpen = ref(false)
 
     const products = ref([
       {
@@ -215,7 +239,14 @@ export default {
     const scrollToSection = (sectionId) => {
       const element = document.getElementById(sectionId)
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
+        const headerHeight = document.querySelector('header').offsetHeight
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        const offsetPosition = elementPosition - headerHeight - 10
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        })
       }
     }
 
@@ -267,6 +298,14 @@ export default {
       }
     })
 
+    watch(mobileMenuOpen, (isOpen) => {
+      if (isOpen) {
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.body.style.overflow = ''
+      }
+    })
+
     return {
       t,
       locale,
@@ -283,6 +322,7 @@ export default {
       scrollToSection,
       products,
       currentProductIndex,
+      mobileMenuOpen,
       nextProduct,
       prevProduct,
       themeTextStyle
@@ -352,8 +392,43 @@ header.floating .logo {
   flex-wrap: wrap;
 }
 
+.hamburger {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  gap: 4px;
+  z-index: 1001;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: var(--text-white);
+  transition: all 0.3s ease;
+  border-radius: 3px;
+}
+
+.hamburger.active span {
+  background: var(--primary-color);
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
 .nav-link {
-  color: var(--text-white);
+  color: var(--primary-color);
   text-decoration: none;
   font-size: 1.1rem;
   font-weight: 500;
@@ -362,12 +437,30 @@ header.floating .logo {
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  color: var(--primary-light);
+  background: transparent;
   transform: translateY(-2px);
+}
+
+.nav-link:active {
+  color: var(--primary-light);
+  transform: translateY(0);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .nav-link:hover {
+    backdrop-filter: none;
+    transform: none;
+  }
+  
+  .nav-link:active {
+    background: transparent;
+  }
 }
 
 header.floating .nav-link {
@@ -376,7 +469,13 @@ header.floating .nav-link {
 }
 
 header.floating .nav-link:hover {
-  background: rgba(255, 255, 255, 0.2);
+  color: var(--primary-light);
+  background: transparent;
+  transform: translateY(-2px);
+}
+
+header.floating .nav-link:active {
+  color: var(--primary-light);
 }
 
 .theme-controls {
@@ -384,6 +483,14 @@ header.floating .nav-link:hover {
   gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.theme-controls.mobile-in-menu {
+  display: none;
+}
+
+.theme-controls.desktop-only {
+  display: flex;
 }
 
 .theme-dropdown {
@@ -669,7 +776,7 @@ h2 {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  border: 2px solid var(--border-light);
+  border: 1px solid var(--border-light);
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -685,149 +792,6 @@ h2 {
   background: var(--primary-color);
   border-color: var(--primary-color);
   transform: scale(1.3);
-}
-
-@media (max-width: 768px) {
-  .products-section {
-    padding: 3rem 1rem;
-  }
-  
-  .products-section h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .products-carousel {
-    gap: 1rem;
-  }
-  
-  .products-slider {
-    height: auto;
-    min-height: 550px;
-    overflow: hidden;
-  }
-  
-  .product-card {
-    flex-direction: column;
-    gap: 0;
-  }
-  
-  .product-card.prev,
-  .product-card.next {
-    opacity: 0.3;
-    transform: translateX(-105%) scale(0.9);
-  }
-  
-  .product-card.next {
-    transform: translateX(105%) scale(0.9);
-  }
-  
-  .product-image-wrapper {
-    min-width: 100%;
-    max-height: 300px;
-  }
-  
-  .product-info {
-    padding: 1.5rem;
-  }
-  
-  .product-title {
-    font-size: 1.5rem;
-  }
-  
-  .product-description {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .carousel-arrow {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .carousel-arrow svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .products-section {
-    padding: 2rem 0.5rem;
-  }
-  
-  .products-section h2 {
-    font-size: 1.75rem;
-    padding: 0 0.5rem;
-  }
-  
-  .products-carousel {
-    gap: 0.5rem;
-  }
-  
-  .products-slider {
-    min-height: 500px;
-    overflow: hidden;
-  }
-  
-  .product-card.prev,
-  .product-card.next {
-    opacity: 0;
-    transform: translateX(-100%) scale(0.8);
-    pointer-events: none;
-  }
-  
-  .product-card.next {
-    transform: translateX(100%) scale(0.8);
-  }
-  
-  .product-card.active {
-    transform: translateX(0) scale(1);
-  }
-  
-  .product-image-wrapper {
-    max-height: 220px;
-  }
-  
-  .product-info {
-    padding: 1rem;
-  }
-  
-  .product-title {
-    font-size: 1.25rem;
-  }
-  
-  .product-description {
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-  }
-  
-  .view-detail-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-    width: 100%;
-  }
-  
-  .carousel-arrow {
-    width: 36px;
-    height: 36px;
-    border-width: 1px;
-  }
-  
-  .carousel-arrow svg {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .product-indicators {
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-  }
-  
-  .product-indicator {
-    width: 10px;
-    height: 10px;
-  }
 }
 
 .contact-us {
@@ -877,26 +841,6 @@ footer {
   color: var(--text-primary);
   text-align: center;
   padding: 1rem;
-}
-
-@media (max-width: 768px) {
-  footer {
-    padding: 1rem 0.75rem;
-  }
-  
-  footer p {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 480px) {
-  footer {
-    padding: 0.75rem 0.5rem;
-  }
-  
-  footer p {
-    font-size: 0.8rem;
-  }
 }
 
 footer p {
@@ -965,20 +909,6 @@ footer p {
   margin-top: 8rem;
 }
 
-@media (max-width: 768px) {
-  .site-intro {
-    padding: 2rem 1rem;
-    margin-top: 6rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .site-intro {
-    padding: 1.5rem 0.75rem;
-    margin-top: 4rem;
-  }
-}
-
 .site-intro h2 {
   font-size: 3.5rem;
   margin: 0 0 1rem 0;
@@ -997,7 +927,6 @@ footer p {
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-/* Navigation Dots */
 .navigation-dots {
   position: absolute;
   bottom: 2rem;
@@ -1005,47 +934,18 @@ footer p {
   transform: translateX(-50%);
   display: flex;
   gap: 1rem;
-  z-index: 20;
-}
-
-@media (max-width: 768px) {
-  .navigation-dots {
-    bottom: 1.5rem;
-    gap: 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .navigation-dots {
-    bottom: 1rem;
-    gap: 0.5rem;
-  }
+  z-index: 10;
 }
 
 .nav-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  border: 2px solid var(--border-light);
+  border: 1px solid var(--border-light);
   background: rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-}
-
-@media (max-width: 768px) {
-  .nav-dot {
-    width: 10px;
-    height: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .nav-dot {
-    width: 8px;
-    height: 8px;
-    border-width: 1px;
-  }
 }
 
 .nav-dot:hover {
@@ -1082,11 +982,121 @@ footer p {
   }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
+  footer {
+    padding: 1rem 0.75rem;
+  }
+  
+  footer p {
+    font-size: 0.9rem;
+  }
+
+  header {
+    padding: 1rem;
+  }
+  
+  header.floating {
+    padding: 0.75rem 1rem;
+  }
+
+  header.floating .logo {
+    height: 40px;
+  }
+  
+  main {
+    padding: 1rem 0.75rem;
+  }
+  
+  section {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .theme-dropdown {
+    width: 70%
+  }
+
+  .theme-controls {
+    justify-content: center;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  
+  .theme-select {
+    justify-content: center;
+    width: 100%;
+    min-width: auto;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  }
+  
+  .header-content {
+    flex-direction: row-reverse;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .logo-section {
+    align-self: center;
+  }
+  
+  .logo {
+    height: 35px;
+  }
+
+  .products-section {
+    padding: 3rem 2rem;
+  }
+  
+  .products-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 3.5rem;
+  }
+  
+  .products-carousel {
+    gap: 1rem;
+  }
+  
+  .products-slider {
+    height: auto;
+    min-height: 550px;
+    overflow: hidden;
+  }
+  
+  .product-card {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .product-card.prev,
+  .product-card.next {
+    opacity: 0.3;
+    transform: translateX(-105%) scale(0.9);
+  }
+  
+  .product-card.next {
+    transform: translateX(105%) scale(0.9);
+  }
+  
+  .product-image-wrapper {
+    min-width: 100%;
+    max-height: 300px;
+  }
+  
+  .product-info {
+    padding: 1.5rem;
+  }
+
+  .products-intro {
+    height: 70vh;
+  }
+  
   .site-intro {
-    padding: 2rem 1.5rem;
-    margin: 1rem;
+    padding: 2rem 1rem;
+    margin-top: 4rem;
   }
   
   .site-intro h2 {
@@ -1096,9 +1106,138 @@ footer p {
   .site-intro p {
     font-size: 1.2rem;
   }
+  
+  .nav-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .navigation-dots {
+    bottom: 1.5rem;
+    gap: 0.75rem;
+  }
+  
+  .product-title {
+    font-size: 1.5rem;
+  }
+  
+  .product-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .carousel-arrow {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .carousel-arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .about-section {
+    padding: 3rem 2rem;
+  }
+
+  .about-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 3.5rem;
+  }
+
+  .about-section p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 3.5rem;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+  
+  .theme-controls.desktop-only {
+    display: none;
+  }
+  
+  .theme-controls.mobile-in-menu {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .navigation {
+    position: fixed;
+    top: 0px;
+    left: -100%;
+    width: 100%;
+    height: calc(100vh);
+    background: color-mix(in srgb, var(--bg-primary) 80%, transparent);
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 2rem;
+    gap: 1.5rem;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-y: auto;
+  }
+  
+  .navigation.mobile-open {
+    left: 0;
+    padding-top: calc(6vh);
+    z-index: 1000;
+  }
 }
 
 @media (max-width: 480px) {
+  header {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  header.floating {
+    padding: 0.5rem;
+  }
+
+  header.floating .logo {
+    height: 25px;
+  }
+
+  footer {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  footer p {
+    font-size: 0.8rem;
+  }
+
+  main {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  section {
+    padding: 1rem 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }
+
+  .products-intro {
+    height: 60vh;
+  }
+  
+  .site-intro {
+    padding: 1.5rem 0.75rem;
+    margin-top: 2rem;
+  }
+  
   .site-intro h2 {
     font-size: 2rem;
   }
@@ -1106,9 +1245,191 @@ footer p {
   .site-intro p {
     font-size: 1rem;
   }
+  
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+
+  .navigation-dots {
+    bottom: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .intro-image {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .theme-controls.desktop-only {
+    display: none;
+  }
+
+  .theme-controls.mobile-in-menu {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .header-content {
+    gap: 0.75rem;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+  }
+
+  .logo-section {
+    flex: -1;
+  }
+
+  .logo {
+    height: 30px;
+  }
+  
+  .navigation {
+    gap: 0.5rem;
+    flex-direction: column;
+  }
+  
+  .nav-link {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .navigation.mobile-open {
+    left: 0;
+    padding-top: calc(6vh);
+    z-index: 1000;
+  }
+  
+  .theme-dropdown {
+    width: 80%;
+  }
+
+  .theme-controls {
+    justify-content: center;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  
+  .theme-select {
+    justify-content: center;
+    width: 100%;
+    min-width: auto;
+    font-size: 0.85rem;
+    padding: 0.4rem 1.25rem 0.4rem 0.6rem;
+  }
+  
+  .about-section p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .products-section {
+    padding: 2rem 0.5rem;
+  }
+  
+  .products-section h2 {
+    font-size: 1.75rem;
+    padding: 0 0.5rem;
+  }
+  
+  .products-carousel {
+    gap: 0.5rem;
+  }
+  
+  .products-slider {
+    min-height: 500px;
+    overflow: hidden;
+  }
+  
+  .product-card.prev,
+  .product-card.next {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.8);
+    pointer-events: none;
+  }
+  
+  .product-card.next {
+    transform: translateX(100%) scale(0.8);
+  }
+  
+  .product-card.active {
+    transform: translateX(0) scale(1);
+  }
+  
+  .product-image-wrapper {
+    max-height: 220px;
+  }
+
+  .product-info {
+    padding: 1rem;
+  }
+  
+  .product-title {
+    font-size: 1.25rem;
+  }
+  
+  .product-description {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  
+  .view-detail-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  
+  .carousel-arrow {
+    width: 36px;
+    height: 36px;
+    border-width: 1px;
+  }
+  
+  .carousel-arrow svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .product-indicators {
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .product-indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .about-section {
+    padding: 2rem 0.5rem;
+  }
+
+  .about-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .about-section p {
+    font-size: 1.0rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
 }
 
-/* Tablet Styles */
 @media (max-width: 1024px) {
   .header-content {
     max-width: 95%;
@@ -1125,126 +1446,4 @@ footer p {
   }
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
-  header {
-    padding: 1rem;
-  }
-  
-  header.floating {
-    padding: 0.75rem 1rem;
-  }
-  
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-  
-  .logo-section {
-    align-self: center;
-  }
-  
-  .navigation {
-    gap: 1rem;
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .nav-link {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
-  }
-  
-  .logo {
-    height: 35px;
-  }
-  
-  header.floating .logo {
-    height: 30px;
-  }
-  
-  .theme-controls {
-    justify-content: center;
-    width: 100%;
-    gap: 0.75rem;
-  }
-  
-  .theme-select {
-    min-width: 120px;
-    font-size: 0.9rem;
-    padding: 0.5rem 1.5rem 0.5rem 0.75rem;
-  }
-  
-  main {
-    padding: 1rem 0.75rem;
-  }
-  
-  section {
-    padding: 1.5rem 1rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-/* Small Mobile Styles */
-@media (max-width: 480px) {
-  header {
-    padding: 0.75rem 0.5rem;
-  }
-  
-  header.floating {
-    padding: 0.5rem;
-  }
-  
-  .header-content {
-    gap: 0.75rem;
-  }
-  
-  .navigation {
-    gap: 0.5rem;
-    flex-direction: column;
-  }
-  
-  .nav-link {
-    font-size: 0.85rem;
-    padding: 0.3rem 0.6rem;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .logo {
-    height: 30px;
-  }
-  
-  header.floating .logo {
-    height: 25px;
-  }
-  
-  .theme-controls {
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-  }
-  
-  .theme-select {
-    min-width: 100%;
-    font-size: 0.85rem;
-    padding: 0.4rem 1.25rem 0.4rem 0.6rem;
-  }
-  
-  main {
-    padding: 0.75rem 0.5rem;
-  }
-  
-  section {
-    padding: 1rem 0.75rem;
-    margin-bottom: 1rem;
-    border-radius: 6px;
-  }
-  
-  .about-section p {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-}
 </style>
