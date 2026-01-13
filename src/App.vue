@@ -631,7 +631,7 @@ h2 {
   height: 100%;
   opacity: 0;
   transform: translateX(100%) scale(0.85);
-  transition: all 0.6s ease-in-out;
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
   display: flex;
   gap: 2rem;
   background: var(--bg-card);
@@ -640,6 +640,7 @@ h2 {
   box-shadow: var(--shadow);
   pointer-events: none;
   z-index: 1;
+  will-change: transform, opacity;
 }
 
 .product-card.active {
@@ -650,25 +651,22 @@ h2 {
 }
 
 .product-card:not(.active) {
-  filter: blur(2px);
   opacity: 0;
   pointer-events: none;
 }
 
 /* Show previous card on the left */
 .product-card.prev {
-  opacity: 0.5;
+  opacity: 0.3;
   transform: translateX(-110%) scale(0.85);
   z-index: 2;
-  filter: blur(1px);
 }
 
 /* Show next card on the right */
 .product-card.next {
-  opacity: 0.5;
+  opacity: 0.3;
   transform: translateX(110%) scale(0.85);
   z-index: 2;
-  filter: blur(1px);
 }
 
 .product-image-wrapper {
@@ -681,11 +679,7 @@ h2 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.product-card:hover .product-image {
-  transform: scale(1.05);
+  transition: transform 0.3s ease;
 }
 
 .product-info {
@@ -740,23 +734,18 @@ h2 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
   flex-shrink: 0;
   color: var(--text-primary);
   box-shadow: var(--shadow);
   z-index: 10;
   position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .carousel-arrow:active {
   transform: scale(0.95);
-}
-
-.carousel-arrow:hover {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: var(--text-white);
-  transform: scale(1.1);
 }
 
 .carousel-arrow svg {
@@ -779,13 +768,9 @@ h2 {
   border: 1px solid var(--border-light);
   background: transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.product-indicator:hover {
-  background: var(--primary-light);
-  border-color: var(--primary-color);
-  transform: scale(1.2);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .product-indicator.active {
@@ -979,6 +964,25 @@ footer p {
   }
   100% {
     text-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover .product-image {
+    transform: scale(1.05);
+  }
+
+  .carousel-arrow:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--text-white);
+    transform: scale(1.1);
+  }
+
+  .product-indicator:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    transform: scale(1.2);
   }
 }
 
