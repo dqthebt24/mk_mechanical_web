@@ -19,13 +19,13 @@
           
           <div class="theme-controls mobile-in-menu" :class="{ 'mobile-open': mobileMenuOpen }">
             <div class="theme-dropdown">
-              <select v-model="locale" @change="changeLanguage(locale)" class="theme-select">
+              <select v-model="locale" @change="changeLanguage(locale); mobileMenuOpen = false" class="theme-select">
                 <option value="en">{{ t('languages.english') }}</option>
                 <option value="vi">{{ t('languages.vietnamese') }}</option>
               </select>
             </div>
             <div class="theme-dropdown">
-              <select v-model="selectedTheme" @change="changeTheme" class="theme-select">
+              <select v-model="selectedTheme" @change="changeTheme(); mobileMenuOpen = false" class="theme-select">
                 <option v-for="theme in themes" :key="theme.value" :value="theme.value">
                   {{ t(theme.label) }}
                 </option>
@@ -850,6 +850,7 @@ footer p {
 
 /* Products Intro Section */
 .products-intro {
+  background-color: rgba(0, 0, 0, 0.5);
   position: relative;
   height: 100vh;
   overflow: hidden;
@@ -1030,6 +1031,7 @@ footer p {
   section {
     padding: 1.5rem 1rem;
     margin-bottom: 1.5rem;
+    border-radius: 0;
   }
 
   .theme-dropdown {
@@ -1111,7 +1113,7 @@ footer p {
   }
 
   .products-intro {
-    height: 70vh;
+    height: 100vh;
   }
   
   .site-intro {
@@ -1249,11 +1251,11 @@ footer p {
   section {
     padding: 1rem 0.75rem;
     margin-bottom: 1rem;
-    border-radius: 6px;
+    border-radius: 0;
   }
 
   .products-intro {
-    height: 60vh;
+    height: 100vh;
   }
   
   .site-intro {
