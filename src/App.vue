@@ -63,15 +63,6 @@
         <h2>{{t('intro.title')}}</h2>
         <p>{{t('intro.description')}}</p>
       </div>
-      <div class="navigation-dots">
-        <button 
-          v-for="(dot, index) in 2" 
-          :key="index"
-          @click="setCurrentImage(index)"
-          :class="{ active: currentImage === index }"
-          class="nav-dot"
-        ></button>
-      </div>
     </section>
 
     <main>
@@ -233,10 +224,6 @@ export default {
       localStorage.setItem('theme', selectedTheme.value)
     }
 
-    const setCurrentImage = (index) => {
-      currentImage.value = index
-    }
-
     const scrollToSection = (sectionId) => {
       const element = document.getElementById(sectionId)
       if (element) {
@@ -332,7 +319,6 @@ export default {
       isScrolled,
       changeTheme,
       changeLanguage,
-      setCurrentImage,
       scrollToSection,
       products,
       currentProductIndex,
@@ -929,41 +915,6 @@ footer p {
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-.navigation-dots {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 1rem;
-  z-index: 10;
-}
-
-.nav-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid var(--border-light);
-  background: rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.nav-dot:hover {
-  background: var(--primary-color);
-  border-color: var(--border-light);
-  transform: scale(1.2);
-  box-shadow: 0 0 10px var(--primary-color);
-}
-
-.nav-dot.active {
-  background: var(--primary-color);
-  border-color: var(--border-light);
-  transform: scale(1.3);
-  box-shadow: 0 0 15px var(--primary-color);
-}
-
 @keyframes fadeInUp {
   0% {
     opacity: 0;
@@ -1129,16 +1080,6 @@ footer p {
     font-size: 1.2rem;
   }
   
-  .nav-dot {
-    width: 10px;
-    height: 10px;
-  }
-
-  .navigation-dots {
-    bottom: 1.5rem;
-    gap: 0.75rem;
-  }
-  
   .product-title {
     font-size: 1.5rem;
   }
@@ -1269,17 +1210,6 @@ footer p {
   
   .site-intro p {
     font-size: 1rem;
-  }
-  
-  .nav-dot {
-    width: 8px;
-    height: 8px;
-    border-width: 1px;
-  }
-
-  .navigation-dots {
-    bottom: 1rem;
-    gap: 0.5rem;
   }
   
   .intro-image {
