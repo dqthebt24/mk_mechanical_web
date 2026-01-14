@@ -117,7 +117,7 @@
           <button 
             v-for="(product, index) in products"
             :key="index"
-            @click="currentProductIndex = index"
+            @click="setProductIndex(index)"
             :class="{ active: index === currentProductIndex }"
             class="product-indicator"
           ></button>
@@ -183,6 +183,7 @@ export default {
     const isScrolled = ref(false)
     const currentProductIndex = ref(0)
     const mobileMenuOpen = ref(false)
+    const isTransitioning = ref(false)
 
     const products = ref([
       {
@@ -256,11 +257,24 @@ export default {
     }
 
     const nextProduct = () => {
+      if (isTransitioning.value) return
+      isTransitioning.value = true
       currentProductIndex.value = (currentProductIndex.value + 1) % products.value.length
+      setTimeout(() => { isTransitioning.value = false }, 350)
     }
 
     const prevProduct = () => {
+      if (isTransitioning.value) return
+      isTransitioning.value = true
       currentProductIndex.value = (currentProductIndex.value - 1 + products.value.length) % products.value.length
+      setTimeout(() => { isTransitioning.value = false }, 350)
+    }
+
+    const setProductIndex = (index) => {
+      if (isTransitioning.value || index === currentProductIndex.value) return
+      isTransitioning.value = true
+      currentProductIndex.value = index
+      setTimeout(() => { isTransitioning.value = false }, 350)
     }
 
     const themeTextStyle = computed(() => {
@@ -325,6 +339,7 @@ export default {
       mobileMenuOpen,
       nextProduct,
       prevProduct,
+      setProductIndex,
       themeTextStyle
     }
   }
@@ -407,8 +422,9 @@ header.floating .logo {
   width: 25px;
   height: 3px;
   background: var(--text-white);
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
   border-radius: 3px;
+  will-change: transform;
 }
 
 .hamburger.active span {
@@ -1189,10 +1205,13 @@ footer p {
     justify-content: flex-start;
     padding: 2rem;
     gap: 1.5rem;
-    transition: left 0.3s ease;
+    transition: left 0.25s ease-out;
     z-index: 1000;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     overflow-y: auto;
+    will-change: left;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
   }
   
   .navigation.mobile-open {
