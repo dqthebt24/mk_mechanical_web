@@ -332,9 +332,21 @@ export default {
 }
 </script>
 
+<style>
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+</style>
+
 <style scoped>
 .app {
   min-height: 100vh;
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -538,19 +550,22 @@ header.floating .theme-select {
 main {
   flex: 1;
   width: 100%;
+  max-width: 100vw;
   margin: 0 auto;
   padding: 0;
   position: relative;
   z-index: 5;
+  overflow-x: hidden;
 }
 
 section {
   background: var(--bg-card);
-  border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
   box-shadow: var(--shadow);
   transition: all 0.3s ease;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .about-section {
@@ -855,6 +870,7 @@ footer p {
   opacity: 0;
   transform: translateX(100%);
   transition: all 0.8s ease-in-out;
+  overflow: hidden;
 }
 
 .image-container.active {
@@ -870,19 +886,20 @@ footer p {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.5s ease;
 }
 
 .image1 .intro-image {
-  transform: scale(1.1) rotate(2deg);
+  transform: scale(1.05);
 }
 
 .image2 .intro-image {
-  transform: scale(1.15) rotate(-1deg);
+  transform: scale(1.05);
 }
 
 .image-container:hover .intro-image {
-  transform: scale(1.25) rotate(0deg);
+  transform: scale(1.1);
 }
 
 .site-intro {
