@@ -13,9 +13,9 @@
         </button>
         
         <nav class="navigation" :class="{ 'mobile-open': mobileMenuOpen }">
-          <a @click.prevent="scrollToSection('home'); mobileMenuOpen = false" href="#home" class="nav-link">{{ t('nav.home') }}</a>
-          <a @click.prevent="scrollToSection('products'); mobileMenuOpen = false" href="#products" class="nav-link">{{ t('nav.products') }}</a>
-          <a @click.prevent="scrollToSection('about'); mobileMenuOpen = false" href="#about" class="nav-link">{{ t('nav.about') }}</a>
+          <a @click.prevent="handleNavigation('home')" href="#home" class="nav-link">{{ t('nav.home') }}</a>
+          <a @click.prevent="handleNavigation('products')" href="#products" class="nav-link">{{ t('nav.products') }}</a>
+          <a @click.prevent="handleNavigation('about')" href="#about" class="nav-link">{{ t('nav.about') }}</a>
           
           <div class="theme-controls mobile-in-menu" :class="{ 'mobile-open': mobileMenuOpen }">
             <div class="theme-dropdown">
@@ -92,7 +92,7 @@
               <div class="product-info">
                 <h3 class="product-title">{{ t(product.titleKey) }}</h3>
                 <p class="product-description">{{ t(product.descriptionKey) }}</p>
-                <a :href="product.detailLink" class="view-detail-btn">{{ t('products.viewDetail') }}</a>
+                <button @click="showProductDetail(product)" class="view-detail-btn">{{ t('products.viewDetail') }}</button>
               </div>
             </div>
           </div>
@@ -149,6 +149,39 @@
     <footer>
       <p>{{ t('messages.builtWith') }}</p>
     </footer>
+
+    <div v-if="showDetailProduct && selectedProduct" class="product-detail-modal" @click.self="closeProductDetail">
+      <div class="product-detail-content">
+        <button class="close-btn" @click="closeProductDetail">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="product-detail-layout">
+          <div class="product-detail-image" 
+               @mousemove="handleImageZoom" 
+               @mouseleave="resetImageZoom"
+               @touchstart="handleTouchZoom"
+               @touchmove="handleTouchZoom"
+               @touchend="resetImageZoom"
+               ref="imageContainer">
+            <img :src="selectedProduct.image" 
+                 :alt="t(selectedProduct.titleKey)"
+                 :style="imageZoomStyle"
+                 ref="zoomImage">
+          </div>
+          <div class="product-detail-info">
+            <h2>{{ t(selectedProduct.titleKey) }}</h2>
+            <p class="detail-description">{{ t(selectedProduct.descriptionKey) }}</p>
+            <div class="detail-specs">
+              <h3>{{ t('products.specifications') }}</h3>
+              <p>{{ t(selectedProduct.titleKey + '.details') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -175,6 +208,11 @@ export default {
     const currentProductIndex = ref(0)
     const mobileMenuOpen = ref(false)
     const isTransitioning = ref(false)
+    const showDetailProduct = ref(false)
+    const selectedProduct = ref(null)
+    const imageContainer = ref(null)
+    const zoomImage = ref(null)
+    const imageZoomStyle = ref({})
 
     const products = ref([
       {
@@ -224,20 +262,6 @@ export default {
       localStorage.setItem('theme', selectedTheme.value)
     }
 
-    const scrollToSection = (sectionId) => {
-      const element = document.getElementById(sectionId)
-      if (element) {
-        const headerHeight = document.querySelector('header').offsetHeight
-        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-        const offsetPosition = elementPosition - headerHeight - 10
-        
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        })
-      }
-    }
-
     const changeLanguage = (lang) => {
       locale.value = lang
       localStorage.setItem('language', lang)
@@ -264,6 +288,63 @@ export default {
       setTimeout(() => { isTransitioning.value = false }, 350)
     }
 
+    const showProductDetail = (product) => {
+      selectedProduct.value = product
+      showDetailProduct.value = true
+      document.body.style.overflow = 'hidden'
+      document.body.style.height = '100vh'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    }
+
+    const closeProductDetail = () => {
+      showDetailProduct.value = false
+      selectedProduct.value = null
+      document.body.style.overflow = ''
+      document.body.style.height = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      resetImageZoom()
+    }
+
+    const handleImageZoom = (e) => {
+      if (!imageContainer.value) return
+      
+      const rect = imageContainer.value.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+      
+      imageZoomStyle.value = {
+        transform: 'scale(2)',
+        transformOrigin: `${x}% ${y}%`,
+        cursor: 'zoom-in'
+      }
+    }
+
+    const handleTouchZoom = (e) => {
+      if (!imageContainer.value) return
+      
+      const touch = e.touches[0]
+      if (!touch) return
+      
+      const rect = imageContainer.value.getBoundingClientRect()
+      const x = ((touch.clientX - rect.left) / rect.width) * 100
+      const y = ((touch.clientY - rect.top) / rect.height) * 100
+      
+      imageZoomStyle.value = {
+        transform: 'scale(2)',
+        transformOrigin: `${x}% ${y}%`
+      }
+    }
+
+    const resetImageZoom = () => {
+      imageZoomStyle.value = {
+        transform: 'scale(1)',
+        transformOrigin: 'center center',
+        cursor: 'default'
+      }
+    }
+
     const themeTextStyle = computed(() => {
       const currentTheme = colorThemes[selectedTheme.value] || colorThemes.light
       
@@ -273,6 +354,23 @@ export default {
         shadow: `2px 2px 8px ${currentTheme.primary}40`
       }
     })
+
+    const handleNavigation = (sectionId) => {
+      mobileMenuOpen.value = false
+      setTimeout(() => {
+        const element = document.getElementById(sectionId)
+        if (element) {
+          const headerHeight = document.querySelector('header').offsetHeight
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+          const offsetPosition = elementPosition - headerHeight - 10
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          })
+        }
+      }, 50)
+    }
 
     onMounted(() => {
       const savedLanguage = localStorage.getItem('language') || 'en'
@@ -302,8 +400,10 @@ export default {
     watch(mobileMenuOpen, (isOpen) => {
       if (isOpen) {
         document.body.style.overflow = 'hidden'
+        // document.body.style.position = 'fixed'
       } else {
         document.body.style.overflow = ''
+        // document.body.style.position = ''
       }
     })
 
@@ -319,27 +419,28 @@ export default {
       isScrolled,
       changeTheme,
       changeLanguage,
-      scrollToSection,
+      handleNavigation,
       products,
       currentProductIndex,
       mobileMenuOpen,
       nextProduct,
       prevProduct,
       setProductIndex,
+      showDetailProduct,
+      showProductDetail,
+      closeProductDetail,
+      selectedProduct,
+      imageContainer,
+      zoomImage,
+      imageZoomStyle,
+      handleImageZoom,
+      handleTouchZoom,
+      resetImageZoom,
       themeTextStyle
     }
   }
 }
 </script>
-
-<style>
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
-</style>
 
 <style scoped>
 .app {
@@ -796,6 +897,130 @@ h2 {
   transform: scale(1.3);
 }
 
+/* Product Detail Modal */
+.product-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+  backdrop-filter: blur(5px);
+}
+
+.product-detail-content {
+  background: var(--bg-card);
+  border-radius: 16px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--bg-secondary);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+.close-btn:hover {
+  background: var(--primary-color);
+  color: var(--text-white);
+  transform: rotate(90deg);
+}
+
+.close-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.product-detail-layout {
+  display: flex;
+  gap: 3rem;
+  padding: 3rem;
+}
+
+.product-detail-image {
+  flex: 1;
+  min-width: 45%;
+  max-width: 50%;
+  overflow: hidden;
+  border-radius: 12px;
+  position: relative;
+}
+
+.product-detail-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.product-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.product-detail-info h2 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.detail-description {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.detail-specs h3 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.detail-specs p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
 .contact-us {
   max-width: 1200px;
   margin: 3rem auto 0;
@@ -1153,6 +1378,37 @@ footer p {
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
+
+  .product-detail-modal {
+    padding: 1rem;
+  }
+
+  .product-detail-layout {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .product-detail-image {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .product-detail-info h2 {
+    font-size: 2rem;
+  }
+
+  .detail-description {
+    font-size: 1.1rem;
+  }
+
+  .detail-specs h3 {
+    font-size: 1.3rem;
+  }
+
+  .detail-specs p {
+    font-size: 1rem;
+  }
   
   .navigation {
     position: fixed;
@@ -1200,6 +1456,29 @@ footer p {
   
   footer p {
     font-size: 0.8rem;
+  }
+
+  /* Product Detail Modal - Small Mobile */
+  .product-detail-content {
+    width: 95%;
+    padding: 1rem;
+    max-height: 90vh;
+  }
+
+  .product-detail-layout {
+    gap: 1rem;
+  }
+
+  .product-detail-image {
+    max-height: 200px;
+  }
+
+  .product-detail-info h2 {
+    font-size: 1.25rem;
+  }
+
+  .product-detail-info p {
+    font-size: 0.875rem;
   }
 
   main {
