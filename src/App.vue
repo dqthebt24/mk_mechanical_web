@@ -327,18 +327,12 @@ export default {
       selectedProduct.value = product
       showDetailProduct.value = true
       document.body.style.overflow = 'hidden'
-      document.body.style.height = '100vh'
-      document.body.style.position = 'fixed'
-      document.body.style.width = '100%'
     }
 
     const closeProductDetail = () => {
       showDetailProduct.value = false
       selectedProduct.value = null
       document.body.style.overflow = ''
-      document.body.style.height = ''
-      document.body.style.position = ''
-      document.body.style.width = ''
       resetImageZoom()
     }
 
@@ -419,14 +413,12 @@ export default {
         currentImage.value = (currentImage.value + 1) % 2
       }, 5000)
       
-      // Add scroll event listener for floating header
       const handleScroll = () => {
         isScrolled.value = window.scrollY > 100
       }
       
       window.addEventListener('scroll', handleScroll)
       
-      // Cleanup on unmount
       return () => {
         window.removeEventListener('scroll', handleScroll)
       }
@@ -435,10 +427,8 @@ export default {
     watch(mobileMenuOpen, (isOpen) => {
       if (isOpen) {
         document.body.style.overflow = 'hidden'
-        // document.body.style.position = 'fixed'
       } else {
         document.body.style.overflow = ''
-        // document.body.style.position = ''
       }
     })
 
@@ -1456,6 +1446,21 @@ footer p {
     font-size: 1.3rem;
   }
 
+  .detail-specs .spec-item {
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .detail-specs .spec-label {
+    font-size: 1rem;
+  }
+
+  .detail-specs .spec-value {
+    font-size: 1rem;
+    padding-left: 0;
+  }
+
   .detail-specs p {
     font-size: 1rem;
   }
@@ -1508,7 +1513,6 @@ footer p {
     font-size: 0.8rem;
   }
 
-  /* Product Detail Modal - Small Mobile */
   .product-detail-content {
     width: 95%;
     padding: 1rem;
@@ -1525,6 +1529,26 @@ footer p {
 
   .product-detail-info h2 {
     font-size: 1.25rem;
+  }
+
+  .detail-description {
+    font-size: 0.9rem;
+  }
+
+  .detail-specs h3 {
+    font-size: 1.1rem;
+  }
+
+  .detail-specs .spec-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-specs .spec-label {
+    font-size: 0.9rem;
+  }
+
+  .detail-specs .spec-value {
+    font-size: 0.9rem;
   }
 
   .product-detail-info p {
