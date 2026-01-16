@@ -175,8 +175,39 @@
             <h2>{{ t(selectedProduct.titleKey) }}</h2>
             <p class="detail-description">{{ t(selectedProduct.descriptionKey) }}</p>
             <div class="detail-specs">
-              <h3>{{ t('products.specifications') }}</h3>
-              <p>{{ t(selectedProduct.titleKey + '.details') }}</p>
+              <h3>{{ t('products.detailsTitle') }}</h3>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.workTitle') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.workTitle') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.itemNo') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.itemNo') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.material') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.material') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.brand') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.brand') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.surfaceTreatment') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.surfaceTreatment') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.productDimensions') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.productDimensions') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.size') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.size') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.netWeight') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.netWeight') }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -220,6 +251,7 @@ export default {
         image: product1,
         titleKey: 'products.items.0.title',
         descriptionKey: 'products.items.0.description',
+        detailsKey: 'products.items.0.details',
         detailLink: '#product-1'
       },
       {
@@ -227,6 +259,7 @@ export default {
         image: product2,
         titleKey: 'products.items.1.title',
         descriptionKey: 'products.items.1.description',
+        detailsKey: 'products.items.1.details',
         detailLink: '#product-2'
       },
       {
@@ -234,6 +267,7 @@ export default {
         image: product3,
         titleKey: 'products.items.2.title',
         descriptionKey: 'products.items.2.description',
+        detailsKey: 'products.items.2.details',
         detailLink: '#product-3'
       },
       {
@@ -241,6 +275,7 @@ export default {
         image: product4,
         titleKey: 'products.items.3.title',
         descriptionKey: 'products.items.3.description',
+        detailsKey: 'products.items.3.details',
         detailLink: '#product-4'
       }
     ])
@@ -705,7 +740,6 @@ h2 {
   color: var(--text-primary);
 }
 
-/* Products Section */
 .products-section {
   background: var(--bg-primary);
   padding: 4rem 2rem;
@@ -773,14 +807,12 @@ h2 {
   pointer-events: none;
 }
 
-/* Show previous card on the left */
 .product-card.prev {
   opacity: 0.3;
   transform: translateX(-110%) scale(0.85);
   z-index: 2;
 }
 
-/* Show next card on the right */
 .product-card.next {
   opacity: 0.3;
   transform: translateX(110%) scale(0.85);
@@ -897,7 +929,6 @@ h2 {
   transform: scale(1.3);
 }
 
-/* Product Detail Modal */
 .product-detail-modal {
   position: fixed;
   top: 0;
@@ -924,17 +955,6 @@ h2 {
   position: relative;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .close-btn {
@@ -1015,6 +1035,26 @@ h2 {
   margin-bottom: 1rem;
 }
 
+.detail-specs .spec-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.detail-specs .spec-label {
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  min-width: fit-content;
+}
+
+.detail-specs .spec-value {
+  font-weight: normal;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
 .detail-specs p {
   font-size: 1.1rem;
   line-height: 1.6;
@@ -1074,7 +1114,6 @@ footer p {
   margin: 0;
 }
 
-/* Products Intro Section */
 .products-intro {
   background-color: rgba(0, 0, 0, 0.5);
   position: relative;
@@ -1174,6 +1213,17 @@ footer p {
   }
   100% {
     text-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
