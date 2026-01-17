@@ -868,8 +868,8 @@ h2 {
   background: var(--bg-card);
   border: 2px solid var(--border-light);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -889,8 +889,8 @@ h2 {
 }
 
 .carousel-arrow svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   pointer-events: none;
 }
 
@@ -951,8 +951,8 @@ h2 {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: var(--bg-secondary);
-  border: none;
+  background: var(--bg-card);
+  border: 2px solid var(--border-light);
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -963,12 +963,16 @@ h2 {
   z-index: 10;
   transition: all 0.3s ease;
   color: var(--text-primary);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .close-btn:hover {
   background: var(--primary-color);
+  border-color: var(--primary-color);
   color: var(--text-white);
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-color: var(--primary-color);
 }
 
 .close-btn svg {
@@ -1753,6 +1757,15 @@ footer p {
     padding: 0 0.5rem;
   }
 
+  .close-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .close-btn svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 @media (max-width: 1024px) {
