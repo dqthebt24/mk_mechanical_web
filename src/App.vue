@@ -253,10 +253,10 @@ import logo from './assets/images/LOGO-2.png'
 
 // Product 1 images
 import product1Intro from './assets/products/product_1/intro.jpg'
-import product1_1 from './assets/products/product_1/L1008989.jpg'
-import product1_2 from './assets/products/product_1/L1009009.jpg'
-import product1_3 from './assets/products/product_1/L1009017.jpg'
-import product1_4 from './assets/products/product_1/L1009037.jpg'
+import product1_1 from './assets/products/product_1/DSC6290.jpg'
+import product1_2 from './assets/products/product_1/DSC6305.jpg'
+import product1_3 from './assets/products/product_1/DSC6302.jpg'
+import product1_4 from './assets/products/product_1/DSC6295.jpg'
 
 // Product 2 images
 import product2Intro from './assets/products/product_2/intro.jpg'
