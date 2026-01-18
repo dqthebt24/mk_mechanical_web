@@ -159,18 +159,44 @@
           </svg>
         </button>
         <div class="product-detail-layout">
-          <div class="product-detail-image" 
-               @mousemove="handleImageZoom" 
-               @mouseleave="resetImageZoom"
-               @touchstart="handleTouchZoom"
-               @touchmove="handleTouchZoom"
-               @touchend="resetImageZoom"
-               ref="imageContainer">
-            <img :src="selectedProduct.image" 
-                 :alt="t(selectedProduct.titleKey)"
-                 :style="imageZoomStyle"
-                 ref="zoomImage">
+          <div class="product-detail-image-section">
+            <div class="product-detail-image" 
+                 @mousemove="handleImageZoom" 
+                 @mouseleave="resetImageZoom"
+                 @touchstart="handleTouchZoom"
+                 @touchmove="handleTouchZoom"
+                 @touchend="resetImageZoom"
+                 ref="imageContainer">
+              <img :src="selectedProduct.images[currentDetailImageIndex]" 
+                   :alt="t(selectedProduct.titleKey)"
+                   :style="imageZoomStyle"
+                   ref="zoomImage">
+            </div>
+            
+            <div class="image-slider">
+              <button class="slider-arrow left" @click="prevDetailImage" :disabled="currentDetailImageIndex === 0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              
+              <div class="image-thumbnails" ref="thumbnailsContainer">
+                <div v-for="(img, index) in selectedProduct.images" 
+                     :key="index"
+                     :class="['thumbnail', { active: index === currentDetailImageIndex }]"
+                     @click="setDetailImageIndex(index)">
+                  <img :src="img" :alt="`${t(selectedProduct.titleKey)} ${index + 1}`">
+                </div>
+              </div>
+              
+              <button class="slider-arrow right" @click="nextDetailImage" :disabled="currentDetailImageIndex === selectedProduct.images.length - 1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
           </div>
+          
           <div class="product-detail-info">
             <h2>{{ t(selectedProduct.titleKey) }}</h2>
             <p class="detail-description">{{ t(selectedProduct.descriptionKey) }}</p>
@@ -217,17 +243,41 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch} from 'vue'
 import { version } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { applyTheme, colorThemes } from './utils/themes.js'
 import intro1 from './assets/images/intro_1.jpg'
 import intro2 from './assets/images/intro_2.jpg'
 import logo from './assets/images/LOGO-2.png'
-import product1 from './assets/products/dea84daa22.jpg'
-import product2 from './assets/products/2-4170.jpg'
-import product3 from './assets/products/ip1.jpg'
-import product4 from './assets/products/afa20505a8.jpg'
+
+// Product 1 images
+import product1Intro from './assets/products/product_1/intro.jpg'
+import product1_1 from './assets/products/product_1/L1008989.jpg'
+import product1_2 from './assets/products/product_1/L1009009.jpg'
+import product1_3 from './assets/products/product_1/L1009017.jpg'
+import product1_4 from './assets/products/product_1/L1009037.jpg'
+
+// Product 2 images
+import product2Intro from './assets/products/product_2/intro.jpg'
+import product2_1 from './assets/products/product_2/L1003739.jpg'
+import product2_2 from './assets/products/product_2/L1003743.jpg'
+import product2_3 from './assets/products/product_2/L1003752.jpg'
+import product2_4 from './assets/products/product_2/L1003758.jpg'
+
+// Product 3 images
+import product3Intro from './assets/products/product_3/intro.png'
+import product3_1 from './assets/products/product_3/2-6820.jpg'
+import product3_2 from './assets/products/product_3/D015017-2-d07f.jpg'
+import product3_3 from './assets/products/product_3/D015017-8-426a.jpg'
+import product3_4 from './assets/products/product_3/D015017-9-23fd.jpg'
+
+// Product 4 images
+import product4Intro from './assets/products/product_4/intro.jpg'
+import product4_1 from './assets/products/product_4/L1001920.jpg'
+import product4_2 from './assets/products/product_4/L1001925.jpg'
+import product4_3 from './assets/products/product_4/L1001930.jpg'
+import product4_4 from './assets/products/product_4/L1001933.jpg'
 
 export default {
   name: 'App',
@@ -245,11 +295,14 @@ export default {
     const zoomImage = ref(null)
     const imageZoomStyle = ref({})
     const detailContent = ref(null)
+    const currentDetailImageIndex = ref(0)
+    const thumbnailsContainer = ref(null)
 
     const products = ref([
       {
         id: 1,
-        image: product1,
+        image: product1Intro,
+        images: [product1Intro, product1_1, product1_2, product1_3, product1_4],
         titleKey: 'products.items.0.title',
         descriptionKey: 'products.items.0.description',
         detailsKey: 'products.items.0.details',
@@ -257,7 +310,8 @@ export default {
       },
       {
         id: 2,
-        image: product2,
+        image: product2Intro,
+        images: [product2Intro, product2_1, product2_2, product2_3, product2_4],
         titleKey: 'products.items.1.title',
         descriptionKey: 'products.items.1.description',
         detailsKey: 'products.items.1.details',
@@ -265,7 +319,8 @@ export default {
       },
       {
         id: 3,
-        image: product3,
+        image: product3Intro,
+        images: [product3Intro, product3_1, product3_2, product3_3, product3_4],
         titleKey: 'products.items.2.title',
         descriptionKey: 'products.items.2.description',
         detailsKey: 'products.items.2.details',
@@ -273,7 +328,8 @@ export default {
       },
       {
         id: 4,
-        image: product4,
+        image: product4Intro,
+        images: [product4Intro, product4_1, product4_2, product4_3, product4_4],
         titleKey: 'products.items.3.title',
         descriptionKey: 'products.items.3.description',
         detailsKey: 'products.items.3.details',
@@ -327,14 +383,74 @@ export default {
     const showProductDetail = (product) => {
       selectedProduct.value = product
       showDetailProduct.value = true
+      currentDetailImageIndex.value = 0
       document.body.style.overflow = 'hidden'
     }
 
     const closeProductDetail = () => {
       showDetailProduct.value = false
       selectedProduct.value = null
+      currentDetailImageIndex.value = 0
       document.body.style.overflow = ''
       resetImageZoom()
+    }
+
+    const nextDetailImage = () => {
+      if (!selectedProduct.value) return
+      currentDetailImageIndex.value = (currentDetailImageIndex.value + 1) % selectedProduct.value.images.length
+      resetImageZoom()
+      scrollToActiveThumbnail()
+    }
+
+    const prevDetailImage = () => {
+      if (!selectedProduct.value) return
+      currentDetailImageIndex.value = (currentDetailImageIndex.value - 1 + selectedProduct.value.images.length) % selectedProduct.value.images.length
+      resetImageZoom()
+      scrollToActiveThumbnail()
+    }
+
+    const setDetailImageIndex = (index) => {
+      currentDetailImageIndex.value = index
+      resetImageZoom()
+      scrollToActiveThumbnail()
+    }
+
+    const scrollToActiveThumbnail = () => {
+      if (!thumbnailsContainer.value) return
+      
+      const thumbnails = thumbnailsContainer.value.children
+      const activeThumbnail = thumbnails[currentDetailImageIndex.value]
+      
+      if (activeThumbnail) {
+        const container = thumbnailsContainer.value
+        const thumbnailLeft = activeThumbnail.offsetLeft
+        const thumbnailWidth = activeThumbnail.offsetWidth
+        const containerScrollLeft = container.scrollLeft
+        const containerWidth = container.offsetWidth
+        
+        // Check if thumbnail is not fully visible
+        const thumbnailRight = thumbnailLeft + thumbnailWidth
+        const visibleLeft = containerScrollLeft
+        const visibleRight = containerScrollLeft + containerWidth
+        
+        let scrollTo = containerScrollLeft
+        
+        // If thumbnail is cut off on the right
+        if (thumbnailRight > visibleRight) {
+          scrollTo = thumbnailRight - containerWidth + 8 // 8px padding
+        }
+        // If thumbnail is cut off on the left
+        else if (thumbnailLeft < visibleLeft) {
+          scrollTo = thumbnailLeft - 8 // 8px padding
+        }
+        
+        if (scrollTo !== containerScrollLeft) {
+          container.scrollTo({
+            left: scrollTo,
+            behavior: 'smooth'
+          })
+        }
+      }
     }
 
     const handleImageZoom = (e) => {
@@ -468,9 +584,15 @@ export default {
       showProductDetail,
       closeProductDetail,
       selectedProduct,
+      currentDetailImageIndex,
+      nextDetailImage,
+      prevDetailImage,
+      setDetailImageIndex,
+      scrollToActiveThumbnail,
       imageContainer,
       zoomImage,
       detailContent,
+      thumbnailsContainer,
       imageZoomStyle,
       handleImageZoom,
       handleTouchZoom,
@@ -1001,22 +1123,128 @@ h2 {
   padding: 3rem;
 }
 
-.product-detail-image {
+.product-detail-image-section {
   flex: 1;
   min-width: 45%;
   max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: fit-content;
+}
+
+.product-detail-image {
   overflow: hidden;
   border-radius: 12px;
   position: relative;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
 }
 
 .product-detail-image img {
   width: 100%;
-  height: auto;
+  height: 100%;
   border-radius: 12px;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.3s ease;
   display: block;
+}
+
+.image-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 86px;
+}
+
+.slider-arrow {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.slider-arrow:hover:not(:disabled) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.slider-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slider-arrow svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-primary);
+}
+
+.slider-arrow:hover:not(:disabled) svg {
+  stroke: var(--text-white);
+}
+
+.image-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0.25rem;
+}
+
+.image-thumbnails::-webkit-scrollbar {
+  height: 4px;
+}
+
+.image-thumbnails::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 2px;
+}
+
+.image-thumbnails::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.thumbnail {
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.thumbnail:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.thumbnail.active {
+  border-color: var(--primary-color);
+  opacity: 1;
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .product-detail-info {
@@ -1448,9 +1676,22 @@ footer p {
     gap: 2rem;
   }
 
-  .product-detail-image {
+  .product-detail-image-section {
     max-width: 100%;
     min-width: 100%;
+  }
+
+  .product-detail-image {
+    height: 350px;
+  }
+
+  .image-slider {
+    height: 76px;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 60px;
   }
 
   .product-detail-info h2 {
@@ -1543,7 +1784,11 @@ footer p {
   }
 
   .product-detail-image {
-    max-height: 200px;
+    height: 250px;
+  }
+
+  .image-slider {
+    height: 66px;
   }
 
   .product-detail-info h2 {
@@ -1568,6 +1813,21 @@ footer p {
 
   .detail-specs .spec-value {
     font-size: 0.9rem;
+  }
+
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+
+  .slider-arrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .slider-arrow svg {
+    width: 14px;
+    height: 14px;
   }
 
   .product-detail-info p {
