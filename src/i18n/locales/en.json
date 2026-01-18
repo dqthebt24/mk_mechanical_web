@@ -27,22 +27,73 @@
   },
   "products": {
     "viewDetail": "View Detail",
+    "detailsTitle": "Details",
+    "specs": {
+      "workTitle": "Title of the Work",
+      "itemNo": "Item No",
+      "material": "Material",
+      "brand": "Brand",
+      "surfaceTreatment": "Surface Treatment",
+      "productDimensions": "Product Dimensions",
+      "size": "Size",
+      "netWeight": "Net Weight"
+    },
     "items": [
       {
         "title": "Premium Mechanical Component",
-        "description": "High-precision engineered component with superior durability and performance for industrial applications."
+        "description": "High-precision engineered component with superior durability and performance for industrial applications.",
+        "details": {
+          "workTitle": "Heavy-Duty Industrial Pump",
+          "itemNo": "PMC-2024-001",
+          "material": "Stainless Steel 316L",
+          "brand": "MK Mechanical",
+          "surfaceTreatment": "Polished & Anti-Corrosion Coating",
+          "productDimensions": "450mm x 320mm x 280mm",
+          "size": "Medium (M)",
+          "netWeight": "15.5 kg"
+        }
       },
       {
         "title": "Advanced Industrial Part",
-        "description": "State-of-the-art mechanical part designed for heavy-duty operations with exceptional reliability."
+        "description": "State-of-the-art mechanical part designed for heavy-duty operations with exceptional reliability.",
+        "details": {
+          "workTitle": "Precision Gear Assembly",
+          "itemNo": "AIP-2024-002",
+          "material": "Alloy Steel 4140",
+          "brand": "MK Mechanical",
+          "surfaceTreatment": "Heat Treated & Zinc Plated",
+          "productDimensions": "380mm x 280mm x 150mm",
+          "size": "Standard (S)",
+          "netWeight": "8.2 kg"
+        }
       },
       {
         "title": "Professional Grade Equipment",
-        "description": "Professional-grade mechanical equipment built to withstand demanding work environments."
+        "description": "Professional-grade mechanical equipment built to withstand demanding work environments.",
+        "details": {
+          "workTitle": "Hydraulic Cylinder Unit",
+          "itemNo": "PGE-2024-003",
+          "material": "Carbon Steel Q345B",
+          "brand": "MK Mechanical",
+          "surfaceTreatment": "Powder Coated & Galvanized",
+          "productDimensions": "620mm x 180mm x 180mm",
+          "size": "Large (L)",
+          "netWeight": "22.8 kg"
+        }
       },
       {
         "title": "Precision Engineering Solution",
-        "description": "Cutting-edge precision engineered solution delivering optimal performance and efficiency."
+        "description": "Cutting-edge precision engineered solution delivering optimal performance and efficiency.",
+        "details": {
+          "workTitle": "Automated Valve Controller",
+          "itemNo": "PES-2024-004",
+          "material": "Aluminum Alloy 6061-T6",
+          "brand": "MK Mechanical",
+          "surfaceTreatment": "Anodized & Powder Coated",
+          "productDimensions": "320mm x 240mm x 95mm",
+          "size": "Compact (C)",
+          "netWeight": "4.3 kg"
+        }
       }
     ]
   },

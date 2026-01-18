@@ -13,9 +13,9 @@
         </button>
         
         <nav class="navigation" :class="{ 'mobile-open': mobileMenuOpen }">
-          <a @click.prevent="scrollToSection('home'); mobileMenuOpen = false" href="#home" class="nav-link">{{ t('nav.home') }}</a>
-          <a @click.prevent="scrollToSection('products'); mobileMenuOpen = false" href="#products" class="nav-link">{{ t('nav.products') }}</a>
-          <a @click.prevent="scrollToSection('about'); mobileMenuOpen = false" href="#about" class="nav-link">{{ t('nav.about') }}</a>
+          <a @click.prevent="handleNavigation('home')" href="#home" class="nav-link">{{ t('nav.home') }}</a>
+          <a @click.prevent="handleNavigation('products')" href="#products" class="nav-link">{{ t('nav.products') }}</a>
+          <a @click.prevent="handleNavigation('about')" href="#about" class="nav-link">{{ t('nav.about') }}</a>
           
           <div class="theme-controls mobile-in-menu" :class="{ 'mobile-open': mobileMenuOpen }">
             <div class="theme-dropdown">
@@ -92,7 +92,7 @@
               <div class="product-info">
                 <h3 class="product-title">{{ t(product.titleKey) }}</h3>
                 <p class="product-description">{{ t(product.descriptionKey) }}</p>
-                <a :href="product.detailLink" class="view-detail-btn">{{ t('products.viewDetail') }}</a>
+                <button @click="showProductDetail(product)" class="view-detail-btn">{{ t('products.viewDetail') }}</button>
               </div>
             </div>
           </div>
@@ -149,21 +149,135 @@
     <footer>
       <p>{{ t('messages.builtWith') }}</p>
     </footer>
+
+    <div v-if="showDetailProduct && selectedProduct" class="product-detail-modal" @click.self="closeProductDetail">
+      <div class="product-detail-content" ref="detailContent">
+        <button class="close-btn" @click="closeProductDetail">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="product-detail-layout">
+          <div class="product-detail-image-section">
+            <div class="product-detail-image" 
+                 @mousemove="handleImageZoom" 
+                 @mouseleave="resetImageZoom"
+                 @touchstart="handleTouchZoom"
+                 @touchmove="handleTouchZoom"
+                 @touchend="resetImageZoom"
+                 ref="imageContainer">
+              <img :src="selectedProduct.images[currentDetailImageIndex]" 
+                   :alt="t(selectedProduct.titleKey)"
+                   :style="imageZoomStyle"
+                   ref="zoomImage">
+            </div>
+            
+            <div class="image-slider">
+              <button class="slider-arrow left" @click="prevDetailImage" :disabled="currentDetailImageIndex === 0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              
+              <div class="image-thumbnails" ref="thumbnailsContainer">
+                <div v-for="(img, index) in selectedProduct.images" 
+                     :key="index"
+                     :class="['thumbnail', { active: index === currentDetailImageIndex }]"
+                     @click="setDetailImageIndex(index)">
+                  <img :src="img" :alt="`${t(selectedProduct.titleKey)} ${index + 1}`">
+                </div>
+              </div>
+              
+              <button class="slider-arrow right" @click="nextDetailImage" :disabled="currentDetailImageIndex === selectedProduct.images.length - 1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="product-detail-info">
+            <h2>{{ t(selectedProduct.titleKey) }}</h2>
+            <p class="detail-description">{{ t(selectedProduct.descriptionKey) }}</p>
+            <div class="detail-specs">
+              <h3>{{ t('products.detailsTitle') }}</h3>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.workTitle') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.workTitle') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.itemNo') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.itemNo') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.material') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.material') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.brand') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.brand') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.surfaceTreatment') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.surfaceTreatment') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.productDimensions') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.productDimensions') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.size') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.size') }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">{{ t('products.specs.netWeight') }}:</span>
+                <span class="spec-value">{{ t(selectedProduct.detailsKey + '.netWeight') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch} from 'vue'
 import { version } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { applyTheme, colorThemes } from './utils/themes.js'
 import intro1 from './assets/images/intro_1.jpg'
 import intro2 from './assets/images/intro_2.jpg'
 import logo from './assets/images/LOGO-2.png'
-import product1 from './assets/products/dea84daa22.jpg'
-import product2 from './assets/products/2-4170.jpg'
-import product3 from './assets/products/ip1.jpg'
-import product4 from './assets/products/afa20505a8.jpg'
+
+// Product 1 images
+import product1Intro from './assets/products/product_1/intro.jpg'
+import product1_1 from './assets/products/product_1/DSC6290.jpg'
+import product1_2 from './assets/products/product_1/DSC6305.jpg'
+import product1_3 from './assets/products/product_1/DSC6302.jpg'
+import product1_4 from './assets/products/product_1/DSC6295.jpg'
+
+// Product 2 images
+import product2Intro from './assets/products/product_2/intro.jpg'
+import product2_1 from './assets/products/product_2/L1003739.jpg'
+import product2_2 from './assets/products/product_2/L1003743.jpg'
+import product2_3 from './assets/products/product_2/L1003752.jpg'
+import product2_4 from './assets/products/product_2/L1003758.jpg'
+
+// Product 3 images
+import product3Intro from './assets/products/product_3/intro.png'
+import product3_1 from './assets/products/product_3/2-6820.jpg'
+import product3_2 from './assets/products/product_3/D015017-2-d07f.jpg'
+import product3_3 from './assets/products/product_3/D015017-8-426a.jpg'
+import product3_4 from './assets/products/product_3/D015017-9-23fd.jpg'
+
+// Product 4 images
+import product4Intro from './assets/products/product_4/intro.jpg'
+import product4_1 from './assets/products/product_4/L1001920.jpg'
+import product4_2 from './assets/products/product_4/L1001925.jpg'
+import product4_3 from './assets/products/product_4/L1001930.jpg'
+import product4_4 from './assets/products/product_4/L1001933.jpg'
 
 export default {
   name: 'App',
@@ -175,34 +289,50 @@ export default {
     const currentProductIndex = ref(0)
     const mobileMenuOpen = ref(false)
     const isTransitioning = ref(false)
+    const showDetailProduct = ref(false)
+    const selectedProduct = ref(null)
+    const imageContainer = ref(null)
+    const zoomImage = ref(null)
+    const imageZoomStyle = ref({})
+    const detailContent = ref(null)
+    const currentDetailImageIndex = ref(0)
+    const thumbnailsContainer = ref(null)
 
     const products = ref([
       {
         id: 1,
-        image: product1,
+        image: product1Intro,
+        images: [product1Intro, product1_1, product1_2, product1_3, product1_4],
         titleKey: 'products.items.0.title',
         descriptionKey: 'products.items.0.description',
+        detailsKey: 'products.items.0.details',
         detailLink: '#product-1'
       },
       {
         id: 2,
-        image: product2,
+        image: product2Intro,
+        images: [product2Intro, product2_1, product2_2, product2_3, product2_4],
         titleKey: 'products.items.1.title',
         descriptionKey: 'products.items.1.description',
+        detailsKey: 'products.items.1.details',
         detailLink: '#product-2'
       },
       {
         id: 3,
-        image: product3,
+        image: product3Intro,
+        images: [product3Intro, product3_1, product3_2, product3_3, product3_4],
         titleKey: 'products.items.2.title',
         descriptionKey: 'products.items.2.description',
+        detailsKey: 'products.items.2.details',
         detailLink: '#product-3'
       },
       {
         id: 4,
-        image: product4,
+        image: product4Intro,
+        images: [product4Intro, product4_1, product4_2, product4_3, product4_4],
         titleKey: 'products.items.3.title',
         descriptionKey: 'products.items.3.description',
+        detailsKey: 'products.items.3.details',
         detailLink: '#product-4'
       }
     ])
@@ -222,20 +352,6 @@ export default {
     const changeTheme = () => {
       applyTheme(selectedTheme.value)
       localStorage.setItem('theme', selectedTheme.value)
-    }
-
-    const scrollToSection = (sectionId) => {
-      const element = document.getElementById(sectionId)
-      if (element) {
-        const headerHeight = document.querySelector('header').offsetHeight
-        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-        const offsetPosition = elementPosition - headerHeight - 10
-        
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        })
-      }
     }
 
     const changeLanguage = (lang) => {
@@ -264,6 +380,135 @@ export default {
       setTimeout(() => { isTransitioning.value = false }, 350)
     }
 
+    const showProductDetail = (product) => {
+      selectedProduct.value = product
+      showDetailProduct.value = true
+      currentDetailImageIndex.value = 0
+      document.body.style.overflow = 'hidden'
+    }
+
+    const closeProductDetail = () => {
+      showDetailProduct.value = false
+      selectedProduct.value = null
+      currentDetailImageIndex.value = 0
+      document.body.style.overflow = ''
+      resetImageZoom()
+    }
+
+    const nextDetailImage = () => {
+      if (!selectedProduct.value) return
+      currentDetailImageIndex.value = (currentDetailImageIndex.value + 1) % selectedProduct.value.images.length
+      resetImageZoom()
+      setTimeout(() => scrollToActiveThumbnail(), 50)
+    }
+
+    const prevDetailImage = () => {
+      if (!selectedProduct.value) return
+      currentDetailImageIndex.value = (currentDetailImageIndex.value - 1 + selectedProduct.value.images.length) % selectedProduct.value.images.length
+      resetImageZoom()
+      setTimeout(() => scrollToActiveThumbnail(), 50)
+    }
+
+    const setDetailImageIndex = (index) => {
+      currentDetailImageIndex.value = index
+      resetImageZoom()
+      setTimeout(() => scrollToActiveThumbnail(), 50)
+    }
+
+    const scrollToActiveThumbnail = () => {
+      if (!thumbnailsContainer.value) return
+      
+      const thumbnails = thumbnailsContainer.value.children
+      const activeThumbnail = thumbnails[currentDetailImageIndex.value]
+      
+      if (activeThumbnail) {
+        const container = thumbnailsContainer.value
+        const thumbnailLeft = activeThumbnail.offsetLeft
+        const thumbnailWidth = activeThumbnail.offsetWidth
+        const containerScrollLeft = container.scrollLeft
+        const containerWidth = container.offsetWidth
+        
+        const padding = 16
+
+        const thumbnailRight = thumbnailLeft + thumbnailWidth
+        const visibleLeft = containerScrollLeft + padding
+        const visibleRight = containerScrollLeft + containerWidth - padding
+        
+
+        console.log("TDDB thumbnailWidth ", thumbnailWidth)
+        console.log("TDDB containerWidth ", containerWidth)
+        console.log("TDDB thumbnailRight ", thumbnailRight)
+        console.log("TDDB thumbnailLeft ", thumbnailLeft)
+        console.log("TDDB visibleLeft ", visibleLeft)
+        console.log("TDDB visibleRight ", visibleRight)
+        let scrollTo = null
+        
+        if (thumbnailRight > visibleRight) {
+          scrollTo = thumbnailRight - containerWidth + padding
+        }
+        else{
+          scrollTo = Math.max(0, thumbnailLeft - containerWidth + padding)
+        }
+        
+        if (scrollTo !== null && Math.abs(scrollTo - containerScrollLeft) > 1) {
+          container.scrollTo({
+            left: scrollTo,
+            behavior: 'smooth'
+          })
+        }
+      }
+    }
+
+    const handleImageZoom = (e) => {
+      if (!imageContainer.value) return
+      
+      const rect = imageContainer.value.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+      
+      imageZoomStyle.value = {
+        transform: 'scale(2)',
+        transformOrigin: `${x}% ${y}%`,
+        cursor: 'zoom-in'
+      }
+
+      if (detailContent.value) {
+        detailContent.value.style.overflow = 'hidden'
+      }
+    }
+
+    const handleTouchZoom = (e) => {
+      if (!imageContainer.value) return
+      
+      const touch = e.touches[0]
+      if (!touch) return
+      
+      const rect = imageContainer.value.getBoundingClientRect()
+      const x = ((touch.clientX - rect.left) / rect.width) * 100
+      const y = ((touch.clientY - rect.top) / rect.height) * 100
+      
+      imageZoomStyle.value = {
+        transform: 'scale(2)',
+        transformOrigin: `${x}% ${y}%`
+      }
+
+      if (detailContent.value) {
+        detailContent.value.style.overflow = 'hidden'
+      }
+    }
+
+    const resetImageZoom = () => {
+      imageZoomStyle.value = {
+        transform: 'scale(1)',
+        transformOrigin: 'center center',
+        cursor: 'default'
+      }
+
+      if (detailContent.value) {
+        detailContent.value.style.overflow = ''
+      }
+    }
+
     const themeTextStyle = computed(() => {
       const currentTheme = colorThemes[selectedTheme.value] || colorThemes.light
       
@@ -273,6 +518,23 @@ export default {
         shadow: `2px 2px 8px ${currentTheme.primary}40`
       }
     })
+
+    const handleNavigation = (sectionId) => {
+      mobileMenuOpen.value = false
+      setTimeout(() => {
+        const element = document.getElementById(sectionId)
+        if (element) {
+          const headerHeight = document.querySelector('header').offsetHeight
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+          const offsetPosition = elementPosition - headerHeight - 10
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          })
+        }
+      }, 50)
+    }
 
     onMounted(() => {
       const savedLanguage = localStorage.getItem('language') || 'en'
@@ -286,14 +548,12 @@ export default {
         currentImage.value = (currentImage.value + 1) % 2
       }, 5000)
       
-      // Add scroll event listener for floating header
       const handleScroll = () => {
         isScrolled.value = window.scrollY > 100
       }
       
       window.addEventListener('scroll', handleScroll)
       
-      // Cleanup on unmount
       return () => {
         window.removeEventListener('scroll', handleScroll)
       }
@@ -319,27 +579,35 @@ export default {
       isScrolled,
       changeTheme,
       changeLanguage,
-      scrollToSection,
+      handleNavigation,
       products,
       currentProductIndex,
       mobileMenuOpen,
       nextProduct,
       prevProduct,
       setProductIndex,
+      showDetailProduct,
+      showProductDetail,
+      closeProductDetail,
+      selectedProduct,
+      currentDetailImageIndex,
+      nextDetailImage,
+      prevDetailImage,
+      setDetailImageIndex,
+      scrollToActiveThumbnail,
+      imageContainer,
+      zoomImage,
+      detailContent,
+      thumbnailsContainer,
+      imageZoomStyle,
+      handleImageZoom,
+      handleTouchZoom,
+      resetImageZoom,
       themeTextStyle
     }
   }
 }
 </script>
-
-<style>
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
-</style>
 
 <style scoped>
 .app {
@@ -604,7 +872,6 @@ h2 {
   color: var(--text-primary);
 }
 
-/* Products Section */
 .products-section {
   background: var(--bg-primary);
   padding: 4rem 2rem;
@@ -672,14 +939,12 @@ h2 {
   pointer-events: none;
 }
 
-/* Show previous card on the left */
 .product-card.prev {
   opacity: 0.3;
   transform: translateX(-110%) scale(0.85);
   z-index: 2;
 }
 
-/* Show next card on the right */
 .product-card.next {
   opacity: 0.3;
   transform: translateX(110%) scale(0.85);
@@ -726,6 +991,7 @@ h2 {
   background: var(--primary-color);
   color: var(--text-white);
   text-decoration: none;
+  border: 2px solid var(--border-light);
   border-radius: 8px;
   font-weight: 600;
   font-size: 1rem;
@@ -745,8 +1011,8 @@ h2 {
   background: var(--bg-card);
   border: 2px solid var(--border-light);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -766,8 +1032,8 @@ h2 {
 }
 
 .carousel-arrow svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   pointer-events: none;
 }
 
@@ -794,6 +1060,249 @@ h2 {
   background: var(--primary-color);
   border-color: var(--primary-color);
   transform: scale(1.3);
+}
+
+.product-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+  backdrop-filter: blur(5px);
+}
+
+.product-detail-content {
+  background: var(--bg-card);
+  border-radius: 16px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-light);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-white);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-color: var(--primary-color);
+}
+
+.close-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.product-detail-layout {
+  display: flex;
+  gap: 3rem;
+  padding: 3rem;
+}
+
+.product-detail-image-section {
+  flex: 1;
+  min-width: 45%;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: fit-content;
+}
+
+.product-detail-image {
+  overflow: hidden;
+  border-radius: 12px;
+  position: relative;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+}
+
+.product-detail-image img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.image-slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  height: 86px;
+}
+
+.slider-arrow {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.slider-arrow:hover:not(:disabled) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.slider-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slider-arrow svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-primary);
+}
+
+.slider-arrow:hover:not(:disabled) svg {
+  stroke: var(--text-white);
+}
+
+.image-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0.25rem;
+}
+
+.image-thumbnails::-webkit-scrollbar {
+  height: 4px;
+}
+
+.image-thumbnails::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 2px;
+}
+
+.image-thumbnails::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.thumbnail {
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.thumbnail:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.thumbnail.active {
+  border-color: var(--primary-color);
+  opacity: 1;
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.product-detail-info h2 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.detail-description {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.detail-specs h3 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.detail-specs .spec-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.detail-specs .spec-label {
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  min-width: fit-content;
+}
+
+.detail-specs .spec-value {
+  font-weight: normal;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.detail-specs p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }
 
 .contact-us {
@@ -849,7 +1358,6 @@ footer p {
   margin: 0;
 }
 
-/* Products Intro Section */
 .products-intro {
   background-color: rgba(0, 0, 0, 0.5);
   position: relative;
@@ -949,6 +1457,17 @@ footer p {
   }
   100% {
     text-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -1153,6 +1672,65 @@ footer p {
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
+
+  .product-detail-modal {
+    padding: 1rem;
+  }
+
+  .product-detail-layout {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .product-detail-image-section {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .product-detail-image {
+    height: 350px;
+  }
+
+  .image-slider {
+    height: 76px;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .product-detail-info h2 {
+    font-size: 2rem;
+  }
+
+  .detail-description {
+    font-size: 1.1rem;
+  }
+
+  .detail-specs h3 {
+    font-size: 1.3rem;
+  }
+
+  .detail-specs .spec-item {
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .detail-specs .spec-label {
+    font-size: 1rem;
+  }
+
+  .detail-specs .spec-value {
+    font-size: 1rem;
+    padding-left: 0;
+  }
+
+  .detail-specs p {
+    font-size: 1rem;
+  }
   
   .navigation {
     position: fixed;
@@ -1200,6 +1778,67 @@ footer p {
   
   footer p {
     font-size: 0.8rem;
+  }
+
+  .product-detail-content {
+    width: 95%;
+    padding: 1rem;
+    max-height: 90vh;
+  }
+
+  .product-detail-layout {
+    gap: 1rem;
+  }
+
+  .product-detail-image {
+    height: 250px;
+  }
+
+  .image-slider {
+    height: 66px;
+  }
+
+  .product-detail-info h2 {
+    font-size: 1.25rem;
+  }
+
+  .detail-description {
+    font-size: 0.9rem;
+  }
+
+  .detail-specs h3 {
+    font-size: 1.1rem;
+  }
+
+  .detail-specs .spec-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-specs .spec-label {
+    font-size: 0.9rem;
+  }
+
+  .detail-specs .spec-value {
+    font-size: 0.9rem;
+  }
+
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+
+  .slider-arrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .slider-arrow svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .product-detail-info p {
+    font-size: 0.875rem;
   }
 
   main {
@@ -1400,6 +2039,15 @@ footer p {
     padding: 0 0.5rem;
   }
 
+  .close-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .close-btn svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 @media (max-width: 1024px) {
