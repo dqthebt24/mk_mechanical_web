@@ -399,20 +399,20 @@ export default {
       if (!selectedProduct.value) return
       currentDetailImageIndex.value = (currentDetailImageIndex.value + 1) % selectedProduct.value.images.length
       resetImageZoom()
-      scrollToActiveThumbnail()
+      setTimeout(() => scrollToActiveThumbnail(), 50)
     }
 
     const prevDetailImage = () => {
       if (!selectedProduct.value) return
       currentDetailImageIndex.value = (currentDetailImageIndex.value - 1 + selectedProduct.value.images.length) % selectedProduct.value.images.length
       resetImageZoom()
-      scrollToActiveThumbnail()
+      setTimeout(() => scrollToActiveThumbnail(), 50)
     }
 
     const setDetailImageIndex = (index) => {
       currentDetailImageIndex.value = index
       resetImageZoom()
-      scrollToActiveThumbnail()
+      setTimeout(() => scrollToActiveThumbnail(), 50)
     }
 
     const scrollToActiveThumbnail = () => {
@@ -428,23 +428,29 @@ export default {
         const containerScrollLeft = container.scrollLeft
         const containerWidth = container.offsetWidth
         
-        // Check if thumbnail is not fully visible
+        const padding = 16
+
         const thumbnailRight = thumbnailLeft + thumbnailWidth
-        const visibleLeft = containerScrollLeft
-        const visibleRight = containerScrollLeft + containerWidth
+        const visibleLeft = containerScrollLeft + padding
+        const visibleRight = containerScrollLeft + containerWidth - padding
         
-        let scrollTo = containerScrollLeft
+
+        console.log("TDDB thumbnailWidth ", thumbnailWidth)
+        console.log("TDDB containerWidth ", containerWidth)
+        console.log("TDDB thumbnailRight ", thumbnailRight)
+        console.log("TDDB thumbnailLeft ", thumbnailLeft)
+        console.log("TDDB visibleLeft ", visibleLeft)
+        console.log("TDDB visibleRight ", visibleRight)
+        let scrollTo = null
         
-        // If thumbnail is cut off on the right
         if (thumbnailRight > visibleRight) {
-          scrollTo = thumbnailRight - containerWidth + 8 // 8px padding
+          scrollTo = thumbnailRight - containerWidth + padding
         }
-        // If thumbnail is cut off on the left
-        else if (thumbnailLeft < visibleLeft) {
-          scrollTo = thumbnailLeft - 8 // 8px padding
+        else{
+          scrollTo = Math.max(0, thumbnailLeft - containerWidth + padding)
         }
         
-        if (scrollTo !== containerScrollLeft) {
+        if (scrollTo !== null && Math.abs(scrollTo - containerScrollLeft) > 1) {
           container.scrollTo({
             left: scrollTo,
             behavior: 'smooth'
@@ -1157,6 +1163,7 @@ h2 {
 .image-slider {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   height: 86px;
 }
