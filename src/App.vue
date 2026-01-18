@@ -526,7 +526,14 @@ export default {
         if (element) {
           const headerHeight = document.querySelector('header').offsetHeight
           const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-          const offsetPosition = elementPosition - headerHeight - 10
+          const isMobile = window.innerWidth <= 768
+          
+          let extraOffset = 10
+          if (sectionId === 'products' && isMobile) {
+            extraOffset = -40
+          }
+          
+          const offsetPosition = elementPosition - headerHeight - extraOffset
           
           window.scrollTo({
             top: offsetPosition,
