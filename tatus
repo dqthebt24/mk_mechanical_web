@@ -1,0 +1,70 @@
+[1mdiff --git a/src/App.vue b/src/App.vue[m
+[1mindex 36859d4..da29f20 100644[m
+[1m--- a/src/App.vue[m
+[1m+++ b/src/App.vue[m
+[36m@@ -151,7 +151,7 @@[m
+     </footer>[m
+ [m
+     <div v-if="showDetailProduct && selectedProduct" class="product-detail-modal" @click.self="closeProductDetail">[m
+[31m-      <div class="product-detail-content">[m
+[32m+[m[32m      <div class="product-detail-content" ref="detailContent">[m
+         <button class="close-btn" @click="closeProductDetail">[m
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">[m
+             <line x1="18" y1="6" x2="6" y2="18"></line>[m
+[36m@@ -244,6 +244,7 @@[m [mexport default {[m
+     const imageContainer = ref(null)[m
+     const zoomImage = ref(null)[m
+     const imageZoomStyle = ref({})[m
+[32m+[m[32m    const detailContent = ref(null)[m
+ [m
+     const products = ref([[m
+       {[m
+[36m@@ -348,6 +349,10 @@[m [mexport default {[m
+         transformOrigin: `${x}% ${y}%`,[m
+         cursor: 'zoom-in'[m
+       }[m
+[32m+[m
+[32m+[m[32m      if (detailContent.value) {[m
+[32m+[m[32m        detailContent.value.style.overflow = 'hidden'[m
+[32m+[m[32m      }[m
+     }[m
+ [m
+     const handleTouchZoom = (e) => {[m
+[36m@@ -364,6 +369,10 @@[m [mexport default {[m
+         transform: 'scale(2)',[m
+         transformOrigin: `${x}% ${y}%`[m
+       }[m
+[32m+[m
+[32m+[m[32m      if (detailContent.value) {[m
+[32m+[m[32m        detailContent.value.style.overflow = 'hidden'[m
+[32m+[m[32m      }[m
+     }[m
+ [m
+     const resetImageZoom = () => {[m
+[36m@@ -372,6 +381,10 @@[m [mexport default {[m
+         transformOrigin: 'center center',[m
+         cursor: 'default'[m
+       }[m
+[32m+[m
+[32m+[m[32m      if (detailContent.value) {[m
+[32m+[m[32m        detailContent.value.style.overflow = ''[m
+[32m+[m[32m      }[m
+     }[m
+ [m
+     const themeTextStyle = computed(() => {[m
+[36m@@ -457,6 +470,7 @@[m [mexport default {[m
+       selectedProduct,[m
+       imageContainer,[m
+       zoomImage,[m
+[32m+[m[32m      detailContent,[m
+       imageZoomStyle,[m
+       handleImageZoom,[m
+       handleTouchZoom,[m
+[36m@@ -849,6 +863,7 @@[m [mh2 {[m
+   background: var(--primary-color);[m
+   color: var(--text-white);[m
+   text-decoration: none;[m
+[32m+[m[32m  border: 2px solid var(--border-light);[m
+   border-radius: 8px;[m
+   font-weight: 600;[m
+   font-size: 1rem;[m

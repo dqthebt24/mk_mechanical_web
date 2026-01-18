@@ -151,7 +151,7 @@
     </footer>
 
     <div v-if="showDetailProduct && selectedProduct" class="product-detail-modal" @click.self="closeProductDetail">
-      <div class="product-detail-content">
+      <div class="product-detail-content" ref="detailContent">
         <button class="close-btn" @click="closeProductDetail">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -244,6 +244,7 @@ export default {
     const imageContainer = ref(null)
     const zoomImage = ref(null)
     const imageZoomStyle = ref({})
+    const detailContent = ref(null)
 
     const products = ref([
       {
@@ -348,6 +349,10 @@ export default {
         transformOrigin: `${x}% ${y}%`,
         cursor: 'zoom-in'
       }
+
+      if (detailContent.value) {
+        detailContent.value.style.overflow = 'hidden'
+      }
     }
 
     const handleTouchZoom = (e) => {
@@ -364,6 +369,10 @@ export default {
         transform: 'scale(2)',
         transformOrigin: `${x}% ${y}%`
       }
+
+      if (detailContent.value) {
+        detailContent.value.style.overflow = 'hidden'
+      }
     }
 
     const resetImageZoom = () => {
@@ -371,6 +380,10 @@ export default {
         transform: 'scale(1)',
         transformOrigin: 'center center',
         cursor: 'default'
+      }
+
+      if (detailContent.value) {
+        detailContent.value.style.overflow = ''
       }
     }
 
@@ -457,6 +470,7 @@ export default {
       selectedProduct,
       imageContainer,
       zoomImage,
+      detailContent,
       imageZoomStyle,
       handleImageZoom,
       handleTouchZoom,
@@ -849,6 +863,7 @@ h2 {
   background: var(--primary-color);
   color: var(--text-white);
   text-decoration: none;
+  border: 2px solid var(--border-light);
   border-radius: 8px;
   font-weight: 600;
   font-size: 1rem;
